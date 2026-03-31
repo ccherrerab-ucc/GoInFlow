@@ -18,14 +18,13 @@ class ProfileUpdateRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => [
-                'required',
-                'string',
-                'lowercase',
-                'email',
-                'max:255',
-                Rule::unique(User::class)->ignore($this->user()->id),
-            ],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $this->user()->id],
+
+            'first_surname' => ['required', 'string', 'max:255'],
+            'second_last_name' => ['nullable', 'string', 'max:255'],
+
+            'id_area' => ['required', 'exists:d_area,id_area'],
+            'id_departamento' => ['required', 'exists:departamento,id_departamento'],
         ];
     }
 }

@@ -23,6 +23,7 @@ class User extends Authenticatable
         'email',
         'password',
         'id_area',
+        'id_departamento',
         'id_rol',
         'first_surname',
         'second_last_name',
