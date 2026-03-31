@@ -1,47 +1,84 @@
 <x-guest-layout>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <form method="POST" action="{{ route('login') }}">
-        @csrf
+    <!-- PANEL IZQUIERDO -->
+    <div class="panel-brand">
+        <i class="bi bi-folder2-open fs-1"></i>
+        <h3>GoInFlow</h3>
+        <p class="text-center px-3">
+            Sistema de gestión documental para acreditación CNA
+        </p>
+    </div>
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
+    <!-- PANEL DERECHO -->
+    <div class="panel-form">
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+        <h4>Iniciar sesión</h4>
+        <p class="text-muted">Ingresa con tu cuenta institucional</p>
 
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
+        <!-- STATUS -->
+        <x-auth-session-status class="mb-3 text-success" :status="session('status')" />
 
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
+        <!-- ERROR GLOBAL -->
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                Credenciales incorrectas
+            </div>
+        @endif
 
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800" name="remember">
-                <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
-            </label>
-        </div>
+        <form method="POST" action="{{ route('login') }}">
+            @csrf
 
-        <div class="flex items-center justify-end mt-4">
+            <!-- EMAIL -->
+            <div class="mb-3">
+                <label>Correo</label>
+                <input
+                    type="email"
+                    name="email"
+                    value="{{ old('email') }}"
+                    class="form-control-goinflow"
+                    required
+                >
+                @error('email')
+                    <small class="text-danger">{{ $message }}</small>
+                @enderror
+            </div>
+
+            <!-- PASSWORD -->
+            <div class="mb-3">
+                <label>Contraseña</label>
+                <input
+                    type="password"
+                    name="password"
+                    class="form-control-goinflow"
+                    required
+                >
+                @error('password')
+                    <small class="text-danger">{{ $message }}</small>
+                @enderror
+            </div>
+
+            <!-- REMEMBER -->
+            <div class="mb-3">
+                <input type="checkbox" name="remember">
+                Recordarme
+            </div>
+
+            <!-- FORGOT -->
             @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
+                <div class="mb-3">
+                    <a href="{{ route('password.request') }}">
+                        ¿Olvidaste tu contraseña?
+                    </a>
+                </div>
             @endif
 
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
-    </form>
+            <!-- BUTTON -->
+            <button class="btn-goinflow">
+                Ingresar
+            </button>
+
+        </form>
+
+    </div>
+
 </x-guest-layout>

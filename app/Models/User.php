@@ -22,6 +22,11 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'id_area',
+        'id_rol',
+        'first_surname',
+        'second_last_name',
+        'id_status',
     ];
 
     /**
@@ -45,5 +50,63 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+    //relaciones
+    public function area()
+    {
+        return $this->belongsTo(Area::class, 'id_area', 'id_area');
+    }
+    public function departamento()
+    {
+        return $this->belongsTo(Departamento::class, 'id_departamento', 'id_departamento');
+    }
+
+    public function rol()
+    {
+        return $this->belongsTo(Rol::class, 'id_rol', 'id_rol');
+    }
+
+    public function status()
+    {
+        return $this->belongsTo(Status::class, 'id_status', 'id_status');
+    }
+
+    public function hasRole(string $roleName): bool
+    {
+        // Carga la relación solo si no está ya cargada (evita N+1)
+        $rol = $this->relationLoaded('rol') ? $this->rol : $this->rol()->first();
+
+        if (!$rol) {
+            return false;
+        }
+
+        // Comparación insensible a mayúsculas y espacios
+        return strtolower(trim($rol->name)) === strtolower(trim($roleName));
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->hasRole('Administrador');
+    }
+
+    public function isDirector(): bool
+    {
+        return $this->hasRole('Director');
+    }
+
+    public function isLiderCaracteristica(): bool
+    {
+        return $this->hasRole('LiderCaracteristica');
+    }
+
+    public function isEnlace(): bool
+    {
+        return $this->hasRole('Enlace');
+    }
+
+    public function getRolNombre(): string
+    {
+        $rol = $this->relationLoaded('rol') ? $this->rol : $this->rol()->first();
+        return $rol ? $rol->nombre : 'Sin rol';
     }
 }
