@@ -108,6 +108,6 @@ class User extends Authenticatable
     public function getRolNombre(): string
     {
         $rol = $this->relationLoaded('rol') ? $this->rol : $this->rol()->first();
-        return $rol ? $rol->nombre : 'Sin rol';
+        return $rol ? $rol->name : 'Sin rol';
     }
 }

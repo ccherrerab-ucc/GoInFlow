@@ -55,7 +55,7 @@ class RegisteredUserController extends Controller
             'id_area' => $request->id_area,
             'id_departamento' => $request->id_departamento,
             'id_status' => '1',
-            'id_rol' => '1',
+            'id_rol' => '4',
         ]);
 
         event(new Registered($user));
