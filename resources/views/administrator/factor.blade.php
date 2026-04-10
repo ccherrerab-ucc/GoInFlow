@@ -1,6 +1,6 @@
 @extends('administrator.app')
 
-@section('title', 'Gestión de Usuarios')
+@section('title', 'Inicio')
 
 @section('content')
 <div class="container-fluid">
@@ -70,61 +70,6 @@
         </nav>
     </div>
 </div>
-
-<!-- Modal para crear/editar usuario -->
-<!--div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="userModalLabel">Crear Usuario</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="userForm">
-                    <input type="hidden" id="userId">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="email" class="form-label">Correo electrónico</label>
-                            <input type="email" class="form-control" id="email" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="name" class="form-label">Nombre</label>
-                            <input type="text" class="form-control" id="name" required>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="firstLastName" class="form-label">Primer apellido</label>
-                            <input type="text" class="form-control" id="firstLastName" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="secondLastName" class="form-label">Segundo apellido</label>
-                            <input type="text" class="form-control" id="secondLastName">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="country" class="form-label">País</label>
-                            <input type="text" class="form-control" id="country" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="phone" class="form-label">Número telefónico</label>
-                            <input type="text" class="form-control" id="phone" required>
-                        </div>
-                    </div>
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="sendPassword">
-                        <label class="form-check-label" for="sendPassword">Enviar nueva contraseña al correo</label>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary-custom" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary-custom" id="saveUserBtn">Guardar</button>
-            </div>
-        </div>
-    </div>
-</!--div-->
 <!-- Modal para crear/editar usuario -->
 <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">

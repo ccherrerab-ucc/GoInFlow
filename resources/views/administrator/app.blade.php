@@ -755,7 +755,7 @@
             </a>
  
             <a class="gf-nav-item {{ request()->routeIs('aspectos*') ? 'active' : '' }}"
-               href="{{ route('administrator.aspectos_por_evaluar') }}">
+               href="{{ route('aspectos.index') }}">
                 <i class="bi bi-list-check"></i> Aspectos por evaluar
             </a>
  

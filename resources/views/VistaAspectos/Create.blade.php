@@ -1,11 +1,11 @@
-@extends('layouts.app')
+@extends('administrator.app')
 
 @section('title', 'Nuevo aspecto')
 
 @section('content')
 
 <div class="gf-breadcrumb">
-    <a href="{{ route('aspectos_por_evaluar') }}">Aspectos</a>
+    <a href="{{ route('aspectos.index') }}">Aspectos</a>
     <span class="gf-breadcrumb-sep"><i class="bi bi-chevron-right" style="font-size:10px;"></i></span>
     <span>Nuevo aspecto</span>
 </div>
@@ -150,7 +150,7 @@
             <button type="submit" class="gf-btn gf-btn-primary">
                 <i class="bi bi-check-lg"></i> Guardar aspecto
             </button>
-            <a href="{{ route('aspectos_por_evaluar') }}" class="gf-btn gf-btn-outline">
+            <a href="{{ route('aspectos.index') }}" class="gf-btn gf-btn-outline">
                 <i class="bi bi-x"></i> Cancelar
             </a>
         </div>

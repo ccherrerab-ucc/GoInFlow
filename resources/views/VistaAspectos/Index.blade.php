@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('administrator.app')
 
 @section('title', 'Aspectos por evaluar')
 

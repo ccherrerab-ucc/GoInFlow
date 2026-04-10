@@ -16,27 +16,27 @@ class AspectoController extends Controller
 
     public function index(): View
     {
-        return view('aspectos.index', [
+        return view('VistaAspectos.Index', [
             'aspectos' => $this->service->listar(),
         ]);
     }
 
     public function create(): View
     {
-        return view('aspectos.create', $this->formData());
+        return view('VistaAspectos.create', $this->formData());
     }
 
     public function store(AspectoRequest $request): RedirectResponse
     {
         $this->service->crear($request->validated());
 
-        return redirect()->route('aspectos_por_evaluar')
+        return redirect()->route('aspectos.index')
             ->with('success', 'Aspecto creado exitosamente.');
     }
 
     public function edit(int $id): View
     {
-        return view('aspectos.edit', array_merge(
+        return view('VistaAspectos.edit', array_merge(
             $this->formData(),
             ['aspecto' => $this->service->obtener($id)]
         ));
@@ -46,7 +46,7 @@ class AspectoController extends Controller
     {
         $this->service->actualizar($id, $request->validated());
 
-        return redirect()->route('aspectos_por_evaluar')
+        return redirect()->route('VistaAspectos.Index')
             ->with('success', 'Aspecto actualizado exitosamente.');
     }
 
@@ -54,7 +54,7 @@ class AspectoController extends Controller
     {
         $this->service->eliminar($id);
 
-        return redirect()->route('aspectos_por_evaluar')
+        return redirect()->route('aspectos.index')
             ->with('success', 'Aspecto eliminado exitosamente.');
     }
 
