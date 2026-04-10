@@ -89,7 +89,7 @@ class InitialSetupSeeder extends Seeder
         $departamentos = [
             [
                 'name' => 'Desarrollo',
-                'area_id' => 1, 
+                'area_id' => 1,
                 'status_id' => 1,
             ],
             [
@@ -99,7 +99,7 @@ class InitialSetupSeeder extends Seeder
             ],
             [
                 'name' => 'Selección',
-                'area_id' => 2, 
+                'area_id' => 2,
                 'status_id' => 1,
             ],
             [
@@ -109,7 +109,7 @@ class InitialSetupSeeder extends Seeder
             ],
             [
                 'name' => 'Contabilidad',
-                'area_id' => 3, 
+                'area_id' => 3,
                 'status_id' => 1,
             ],
             [
@@ -119,12 +119,12 @@ class InitialSetupSeeder extends Seeder
             ],
             [
                 'name' => 'Registro Académico',
-                'area_id' => 4, 
+                'area_id' => 4,
                 'status_id' => 1,
             ],
             [
                 'name' => 'Ingeniería de Sistemas',
-                'area_id' => 5, 
+                'area_id' => 5,
                 'status_id' => 1,
             ],
         ];
@@ -146,6 +146,46 @@ class InitialSetupSeeder extends Seeder
             'id_area'   => 1,
             'id_rol'    => 1,
             'id_status' => 1,
+        ]);
+        // STATUS
+        DB::table('status_cna')->insert([
+            ['name' => 'Activo'],
+            ['name' => 'Inactivo']
+        ]);
+
+        // FACTOR
+        DB::table('factors')->insert([
+            [                
+                'name' => 'Factor 1',
+                'description' => 'Descripción del factor 1',
+                'fecha_inicio' => now(),
+                'fecha_fin' => now()->addMonths(6),
+                'status_id' => 1
+            ]
+        ]);
+
+        // CARACTERISTICA
+        DB::table('caracteristicas')->insert([
+            [
+                'name' => 'Característica 1',
+                'description' => 'Descripción de la característica',
+                'factor_id' => 1,
+                'fecha_inicio' => now(),
+                'fecha_fin' => now()->addMonths(6),
+                'status_id' => 1
+            ]
+        ]);
+
+        // ASPECTOS
+        DB::table('aspectos')->insert([
+            [            
+                'name' => 'Aspecto 1',
+                'description' => 'Descripción del aspecto',
+                'caracteristica_id' => 1,
+                'fecha_inicio' => now(),
+                'fecha_fin' => now()->addMonths(6),
+                'status_id' => 1
+            ]
         ]);
     }
 }

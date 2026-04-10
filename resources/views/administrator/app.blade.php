@@ -745,12 +745,12 @@
             </div>
  
             <a class="gf-nav-item {{ request()->routeIs('factores*') ? 'active' : '' }}"
-               href="{{ route('administrator.factor') }}">
+               href="{{ route('factores.index') }}">
                 <i class="bi bi-bookmark-star"></i> Factor
             </a>
  
             <a class="gf-nav-item {{ request()->routeIs('caracteristicas*') ? 'active' : '' }}"
-               href="{{ route('administrator.caracteristicas') }}">
+               href="{{ route('caracteristicas.index') }}">
                 <i class="bi bi-diagram-3"></i> Características
             </a>
  

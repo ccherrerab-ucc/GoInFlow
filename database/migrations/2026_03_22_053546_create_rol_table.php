@@ -80,5 +80,7 @@ return new class extends Migration
         Schema::dropIfExists('rol');
         Schema::dropIfExists('d_area');
         Schema::dropIfExists('status');
+        Schema::dropIfExists('departamento');
+        
     }
 };

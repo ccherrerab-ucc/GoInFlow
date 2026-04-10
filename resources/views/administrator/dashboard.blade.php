@@ -35,14 +35,14 @@
             </div>
         </div>
 
-        <div class="col-md-3">
+        <!--div class="col-md-3">
             <div class="card shadow-sm border-0">
                 <div class="card-body">
                     <h6 class="text-muted">Evidencias</h6>
                     <h3>{{ $evidencias->count() ?? 0 }}</h3>
                 </div>
             </div>
-        </div>
+        </!--div-->
     </div>
 
     <!-- 🔹 ACCIONES -->
