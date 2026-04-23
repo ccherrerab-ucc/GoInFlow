@@ -16,6 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'rol' => \App\Http\Middleware\RolMiddleware::class,
         ]);
     })
+    ->withProviders([
+        App\Providers\AuthServiceProvider::class,        
+    ])
     ->withExceptions(function (Exceptions $exceptions): void {
         //
-    })->create();
+    })
+    ->create();

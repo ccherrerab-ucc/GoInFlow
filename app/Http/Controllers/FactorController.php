@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\FactorRequest;
 use App\Models\StatusCna;
 use App\Models\User;
+use App\Models\Factor;
 use App\Services\FactorService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -20,6 +21,8 @@ class FactorController extends Controller
 
     public function index(): View
     {
+        $this->authorize('viewAny', Factor::class);
+
         return view('VistaFactores.Index', [
             'factores' => $this->service->listar(),
         ]);
@@ -27,11 +30,15 @@ class FactorController extends Controller
 
     public function create(): View
     {
+        $this->authorize('create', Factor::class);
+
         return view('VistaFactores.Create', $this->formData());
     }
 
     public function store(FactorRequest $request): RedirectResponse
     {
+        $this->authorize('create', Factor::class);
+
         $this->service->crear($request->validated());
 
         return redirect()->route('factores.index')
@@ -40,6 +47,11 @@ class FactorController extends Controller
 
     public function edit(int $id): View
     {
+        $factor = $this->service->obtener($id);
+
+        $this->authorize('update', $factor);
+
+
         return view('VistaFactores.Edit', array_merge(
             $this->formData(),
             ['factor' => $this->service->obtener($id)]
@@ -48,6 +60,9 @@ class FactorController extends Controller
 
     public function update(FactorRequest $request, int $id): RedirectResponse
     {
+        $factor = $this->service->obtener($id);
+        $this->authorize('update', $factor);
+
         $this->service->actualizar($id, $request->validated());
 
         return redirect()->route('factores.index')

@@ -55,7 +55,7 @@ class CaracteristicaController extends Controller
         $this->service->eliminar($id);
 
         return redirect()->route('caracteristicas.index')
-            ->with('success', 'Característica eliminada exitosamente.');
+            ->with('success', 'Característica suprimida exitosamente.');
     }
 
     private function formData(): array

@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  * Principio: Inversión de Dependencias (D de SOLID).
  * Los servicios dependen de esta abstracción, no de implementaciones concretas.
  */
-interface CnaRepositoryInterface
+interface AspectoRepositoryInterface
 {
     public function all(): Collection;
  

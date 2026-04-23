@@ -765,8 +765,8 @@
                 <div class="gf-nav-section-title">Gestión documental</div>
             </div>
  
-            <a class="gf-nav-item {{ request()->routeIs('evidencia*') ? 'active' : '' }}"
-               href="{{ route('administrator.evidencia') }}">
+            <a class="gf-nav-item {{ request()->routeIs('evidencias*') ? 'active' : '' }}"
+               href="{{ route('evidencias.index') }}">
                 <i class="bi bi-file-earmark-text"></i> Evidencias
             </a>
  
@@ -783,8 +783,8 @@
                         <div class="gf-nav-section-title">Administración</div>
                     </div>
  
-                    <a class="gf-nav-item {{ request()->routeIs('admin_users*') ? 'active' : '' }}"
-                       href="{{ route('administrator.admin_users') }}">
+                    <a class="gf-nav-item {{ request()->routeIs('usuarios*') ? 'active' : '' }}"
+                       href="{{ route('usuarios.index') }}">
                         <i class="bi bi-people"></i> Usuarios
                     </a>
  

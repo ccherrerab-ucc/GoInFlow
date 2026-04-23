@@ -7,7 +7,7 @@
 <div class="d-flex align-items-center justify-content-between mb-2">
     <div>
         <div class="gf-page-title">Factores</div>
-        <div class="gf-page-sub">Factor 5 — Estructura y procesos académicos</div>
+        <div class="gf-page-sub">Lista de factores</div>
     </div>
     <a href="{{ route('factores.create') }}" class="gf-btn gf-btn-primary">
         <i class="bi bi-plus-lg"></i> Nuevo factor

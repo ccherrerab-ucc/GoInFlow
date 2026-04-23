@@ -2,23 +2,19 @@
 
 namespace App\Services;
 
-//use App\Repositories\FactorRepository;
-//use App\Repositories\Contracts\CnaRepositoryInterface;
-use App\Repositories\Contracts\FactorRepositoryInterface;
-
+use App\Repositories\Contracts\ResultadoRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
 /**
- * Servicio Factor.
- * Principio: Responsabilidad Única — solo contiene lógica de negocio de Factor.
+ * Principio: Responsabilidad Única — solo contiene lógica de negocio de Resultado.
  * Principio: Inversión de Dependencias — depende del repositorio vía inyección.
  * Principio: Abierto/Cerrado — se puede extender sin modificar el controlador.
  */
-class FactorService
+class ResultadoService
 {
-    public function __construct(private readonly FactorRepositoryInterface $repository) {}
+    public function __construct(private readonly ResultadoRepositoryInterface $repository) {}
 
     public function listar(): Collection
     {
@@ -46,5 +42,10 @@ class FactorService
     public function eliminar(int $id): bool
     {
         return $this->repository->delete($id);
+    }
+
+    public function listarPorRelacion(string $tipo, int $idReferencia): Collection
+    {
+        return $this->repository->allByTipoRelacion($tipo, $idReferencia);
     }
 }

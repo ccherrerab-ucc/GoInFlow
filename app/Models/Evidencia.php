@@ -1,0 +1,53 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Evidencia extends Model
+{
+    protected $table = 'evidencia';
+    protected $primaryKey = 'id_evidencia';
+    public $timestamps = true;
+
+    protected $fillable = [
+        'nombre', 'descripcion', 'fecha_inicio', 'fecha_fin',
+        'estado_actual', 'id_aspecto', 'created_at', 'updated_at',
+        'created_by', 'updated_by', 'status_id',
+    ];
+
+    public function estadoActual()
+    {
+        return $this->belongsTo(EstadoDocumento::class, 'estado_actual', 'id_estado');
+    }
+
+    public function aspecto()
+    {
+        return $this->belongsTo(Aspecto::class, 'id_aspecto', 'id_aspecto');
+    }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    public function status()
+    {
+        return $this->belongsTo(Status::class, 'status_id', 'id_status');
+    }
+
+    public function versionDocumentos()
+    {
+        return $this->hasMany(VersionDocumento::class, 'id_evidencia', 'id_evidencia');
+    }
+
+    public function flujoEjecuciones()
+    {
+        return $this->hasMany(FlujoEjecucion::class, 'id_evidencia', 'id_evidencia');
+    }
+}

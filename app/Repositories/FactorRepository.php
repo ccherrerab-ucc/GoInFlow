@@ -3,7 +3,7 @@
 namespace App\Repositories;
  
 use App\Models\Factor;
-use App\Repositories\Contracts\CnaRepositoryInterface;
+use App\Repositories\Contracts\FactorRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
  
@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
  * Principio: Responsabilidad Única (S de SOLID).
  * Solo se encarga de la persistencia de Factor.
  */
-class FactorRepository implements CnaRepositoryInterface
+class FactorRepository implements FactorRepositoryInterface
 {
     public function __construct(private readonly Factor $model) {}
  
@@ -47,5 +47,14 @@ class FactorRepository implements CnaRepositoryInterface
     {
         $factor = $this->model->findOrFail($id);
         return $factor->delete();
+    }
+
+    public function allByFactor(int $id): Collection
+    {
+        return $this->model
+            ->with(['status', 'responsableUser'])
+            ->where('id_factor', $id)
+            ->orderBy('id_factor', 'desc')
+            ->get();
     }
 }

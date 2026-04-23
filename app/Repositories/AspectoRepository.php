@@ -3,7 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Aspecto;
-use App\Repositories\Contracts\CnaRepositoryInterface;
+use App\Repositories\Contracts\AspectoRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  * Repositorio Aspecto.
  * Principio: Responsabilidad Única (S de SOLID).
  */
-class AspectoRepository implements CnaRepositoryInterface
+class AspectoRepository implements AspectoRepositoryInterface
 {
     public function __construct(private readonly Aspecto $model) {}
 
@@ -55,5 +55,16 @@ class AspectoRepository implements CnaRepositoryInterface
     {
         $aspecto = $this->model->findOrFail($id);
         return $aspecto->delete();
+    }
+
+    public function allByFactor(int $id): Collection
+    {
+        return $this->model
+            ->with(['caracteristica.factor', 'status', 'responsableUser'])
+            ->whereHas('caracteristica', function ($query) use ($id) {
+                $query->where('factor_id', $id);
+            })
+            ->orderBy('id_aspecto', 'desc')
+            ->get();
     }
 }

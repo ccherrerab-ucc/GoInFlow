@@ -150,7 +150,9 @@ class InitialSetupSeeder extends Seeder
         // STATUS
         DB::table('status_cna')->insert([
             ['name' => 'Activo'],
-            ['name' => 'Inactivo']
+            ['name' => 'Inactivo'],
+            ['name' => 'En revisión'],
+            ['name' => 'Suprimido']
         ]);
 
         // FACTOR

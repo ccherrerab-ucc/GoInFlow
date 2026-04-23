@@ -3,7 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Caracteristica;
-use App\Repositories\Contracts\CnaRepositoryInterface;
+use App\Repositories\Contracts\CaracteristicaRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  * Repositorio Caracteristica.
  * Principio: Responsabilidad Única (S de SOLID).
  */
-class CaracteristicaRepository implements CnaRepositoryInterface
+class CaracteristicaRepository implements CaracteristicaRepositoryInterface
 {
     public function __construct(private readonly Caracteristica $model) {}
 
@@ -56,4 +56,5 @@ class CaracteristicaRepository implements CnaRepositoryInterface
         $caracteristica = $this->model->findOrFail($id);
         return $caracteristica->delete();
     }
+    
 }

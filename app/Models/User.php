@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -110,4 +111,19 @@ class User extends Authenticatable
         $rol = $this->relationLoaded('rol') ? $this->rol : $this->rol()->first();
         return $rol ? $rol->name : 'Sin rol';
     }
+
+    public function caracteristicas()
+{
+    return $this->hasMany(Caracteristica::class, 'responsable', 'id');
+}
+
+public function factores()
+{
+    return $this->hasMany(Factor::class, 'responsable', 'id');
+}
+
+public function aspectos()
+{
+    return $this->hasMany(Aspecto::class, 'responsable', 'id');
+}
 }
