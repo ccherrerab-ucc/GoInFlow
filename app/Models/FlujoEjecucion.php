@@ -34,6 +34,11 @@ class FlujoEjecucion extends Model
         return $this->belongsTo(EstadoDocumento::class, 'estado_actual', 'id_estado');
     }
 
+    public function pasoActual()
+    {
+        return $this->belongsTo(FlujoPaso::class, 'paso_actual', 'id_paso');
+    }
+
     public function historial()
     {
         return $this->hasMany(FlujoHistorial::class, 'id_ejecucion', 'id_ejecucion');

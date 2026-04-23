@@ -6,14 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class Evidencia extends Model
 {
-    protected $table = 'evidencia';
+    protected $table = 'evidencias';
     protected $primaryKey = 'id_evidencia';
     public $timestamps = true;
 
     protected $fillable = [
         'nombre', 'descripcion', 'fecha_inicio', 'fecha_fin',
-        'estado_actual', 'id_aspecto', 'created_at', 'updated_at',
+        'estado_actual', 'id_aspecto',
         'created_by', 'updated_by', 'status_id',
+    ];
+
+    protected $casts = [
+        'fecha_inicio' => 'datetime',
+        'fecha_fin'    => 'datetime',
     ];
 
     public function estadoActual()

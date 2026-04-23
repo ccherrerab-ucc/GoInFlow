@@ -771,7 +771,7 @@
             </a>
  
             <a class="gf-nav-item {{ request()->routeIs('resultados*') ? 'active' : '' }}"
-               href="{{ route('administrator.resultados') }}">
+               href="{{ route('resultados.index') }}">
                 <i class="bi bi-bar-chart-line"></i> Resultados
             </a>
  

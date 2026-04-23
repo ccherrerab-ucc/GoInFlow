@@ -4,6 +4,8 @@ namespace App\Models;
  
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
  
 class Aspecto extends Model
 {
@@ -52,6 +54,22 @@ class Aspecto extends Model
     public function status(): BelongsTo
     {
         return $this->belongsTo(StatusCna::class, 'status_id', 'id_status');
+    }
+
+    public function evidencias(): HasMany
+    {
+        return $this->hasMany(Evidencia::class, 'id_aspecto', 'id_aspecto');
+    }
+
+    public function flujos(): HasMany
+    {
+        return $this->hasMany(Flujo::class, 'id_aspecto', 'id_aspecto');
+    }
+
+    public function flujoActivo(): HasOne
+    {
+        return $this->hasOne(Flujo::class, 'id_aspecto', 'id_aspecto')
+                    ->where('activo', true);
     }
 }
  

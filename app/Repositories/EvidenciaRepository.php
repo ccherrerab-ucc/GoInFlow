@@ -19,15 +19,15 @@ class EvidenciaRepository implements EvidenciaRepositoryInterface
     public function all(): Collection
     {
         return $this->model
-            ->with(['status', 'responsable', 'aspectos'])
+            ->with(['status', 'aspecto.caracteristica', 'estadoActual'])
             ->orderBy('id_evidencia', 'desc')
             ->get();
     }
- 
+
     public function findById(int $id): ?Model
     {
         return $this->model
-            ->with(['status', 'responsable', 'aspectos'])
+            ->with(['status', 'aspecto.caracteristica', 'estadoActual', 'createdBy', 'updatedBy'])
             ->findOrFail($id);
     }
  

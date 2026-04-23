@@ -28,8 +28,9 @@ class EvidenciaService
 
     public function crear(array $datos): Model
     {
-        $datos['created_by'] = Auth::id();
-        $datos['updated_by'] = Auth::id();
+        $datos['created_by']   = Auth::id();
+        $datos['updated_by']   = Auth::id();
+        $datos['estado_actual'] = 1; // Borrador — estado inicial siempre
         return $this->repository->create($datos);
     }
 

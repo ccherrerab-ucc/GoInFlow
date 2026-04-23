@@ -80,9 +80,9 @@ class EvidenciaController extends Controller
     private function formData(): array
     {
         return [
-            'statuses'  => StatusCna::all(),
-            'aspectos'  => Aspecto::orderBy('name')->get(),
-            'estados'   => EstadoDocumento::all(),
+            'statuses' => StatusCna::all(),
+            'aspectos' => Aspecto::with('caracteristica')->orderBy('name')->get(),
+            'estados'  => EstadoDocumento::all(),
         ];
     }
 }

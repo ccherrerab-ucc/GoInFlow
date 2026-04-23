@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -147,12 +146,19 @@ class InitialSetupSeeder extends Seeder
             'id_rol'    => 1,
             'id_status' => 1,
         ]);
-        // STATUS
+        // STATUS CNA — solo 3 valores según convención del proyecto
         DB::table('status_cna')->insert([
-            ['name' => 'Activo'],
-            ['name' => 'Inactivo'],
-            ['name' => 'En revisión'],
-            ['name' => 'Suprimido']
+            ['name' => 'Activo'],    // id = 1
+            ['name' => 'Inactivo'],  // id = 2
+            ['name' => 'Suprimido'], // id = 3
+        ]);
+
+        // ESTADOS DE DOCUMENTO
+        DB::table('estado_documento')->insert([
+            ['name' => 'Borrador',     'created_at' => now(), 'updated_at' => now()], // id = 1
+            ['name' => 'En revisión',  'created_at' => now(), 'updated_at' => now()], // id = 2
+            ['name' => 'Aprobado',     'created_at' => now(), 'updated_at' => now()], // id = 3
+            ['name' => 'Rechazado',    'created_at' => now(), 'updated_at' => now()], // id = 4
         ]);
 
         // FACTOR
