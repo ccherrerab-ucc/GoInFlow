@@ -11,12 +11,16 @@ class FlujoHistorial extends Model
     public $timestamps = true;
 
     protected $fillable = [
-        'id_ejecucion', 
-        'id_paso', 
-        'usuario_id', 
-        'decision', 
-        'comentario', 
+        'id_ejecucion',
+        'id_paso',
+        'usuario_id',
+        'decision',
+        'comentario',
         'fecha'
+    ];
+
+    protected $casts = [
+        'fecha' => 'datetime',
     ];
 
     public function ejecucion()
@@ -31,6 +35,6 @@ class FlujoHistorial extends Model
 
     public function usuario()
     {
-        return $this->belongsTo(User::class, 'usuario_id', 'id_usuario');
+        return $this->belongsTo(User::class, 'usuario_id', 'id');
     }
 }

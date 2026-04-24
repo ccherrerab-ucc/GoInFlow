@@ -56,6 +56,12 @@ class CaracteristicaService
         return $this->repository->findById($id);
     }
 
+    /** Carga la característica con aspectos, evidencias y ejecuciones activas para la vista de evaluación. */
+    public function obtenerParaEvaluacion(int $id): Model
+    {
+        return $this->repository->findWithEvidencias($id);
+    }
+
     public function crear(array $datos): Model
     {
         // S: auditoría delegada a AuditoriaService

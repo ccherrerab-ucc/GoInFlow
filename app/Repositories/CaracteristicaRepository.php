@@ -56,5 +56,24 @@ class CaracteristicaRepository implements CaracteristicaRepositoryInterface
         $caracteristica = $this->model->findOrFail($id);
         return $caracteristica->delete();
     }
-    
+
+    public function findWithEvidencias(int $id): ?Model
+    {
+        return $this->model
+            ->with([
+                'factor',
+                'status',
+                'responsableUser',
+                'aspectos.responsableUser',
+                'aspectos.status',
+                'aspectos.flujoActivo',
+                'aspectos.evidencias.estadoActual',
+                'aspectos.evidencias.status',
+                'aspectos.evidencias.createdBy',
+                'aspectos.evidencias.flujoEjecuciones' => fn ($q) => $q
+                    ->whereNull('finalizado_at')
+                    ->with('pasoActual'),
+            ])
+            ->findOrFail($id);
+    }
 }

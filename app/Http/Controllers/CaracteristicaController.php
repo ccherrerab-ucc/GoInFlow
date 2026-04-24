@@ -21,6 +21,13 @@ class CaracteristicaController extends Controller
         ]);
     }
 
+    public function show(int $id): View
+    {
+        return view('VistaCaracteristicas.Show', [
+            'caracteristica' => $this->service->obtenerParaEvaluacion($id),
+        ]);
+    }
+
     public function create(): View
     {
         return view('VistaCaracteristicas.create', $this->formData());

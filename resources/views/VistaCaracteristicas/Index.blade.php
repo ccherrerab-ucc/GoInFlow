@@ -57,6 +57,12 @@
                     </td>
                     <td>
                         <div class="d-flex gap-2">
+                            <a href="{{ route('caracteristicas.show', $c->id_caracteristica) }}"
+                               class="gf-btn gf-btn-primary"
+                               style="height:30px;padding:0 10px;font-size:12px;"
+                               title="Ver evaluación">
+                                <i class="bi bi-eye"></i>
+                            </a>
                             <a href="{{ route('caracteristicas.edit', $c->id_caracteristica) }}"
                                class="gf-btn gf-btn-outline"
                                style="height:30px;padding:0 10px;font-size:12px;"

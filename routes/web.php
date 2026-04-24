@@ -7,6 +7,7 @@ use App\Http\Controllers\CaracteristicaController;
 use App\Http\Controllers\AspectoController;
 use App\Http\Controllers\EvidenciaController;
 use App\Http\Controllers\ResultadoController;
+use App\Http\Controllers\FlujoEjecucionController;
 use App\Http\Controllers\UsuarioController;
 use Illuminate\Support\Facades\Route;
 
@@ -47,6 +48,13 @@ Route::resource('caracteristicas', CaracteristicaController::class);
 Route::resource('aspectos', AspectoController::class);
 Route::resource('evidencias', EvidenciaController::class);
 Route::resource('resultados', ResultadoController::class);
+
+// Flujo de aprobación de evidencias
+Route::prefix('flujo')->name('flujo.')->group(function () {
+    Route::post('{evidencia}/iniciar',   [FlujoEjecucionController::class, 'iniciar'])->name('iniciar');
+    Route::post('{evidencia}/decision',  [FlujoEjecucionController::class, 'decision'])->name('decision');
+    Route::post('{evidencia}/reiniciar', [FlujoEjecucionController::class, 'reiniciar'])->name('reiniciar');
+});
 
 
 Route::resource('usuarios', UsuarioController::class);

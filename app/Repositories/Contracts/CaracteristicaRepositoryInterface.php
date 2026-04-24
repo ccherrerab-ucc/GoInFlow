@@ -23,4 +23,7 @@ interface CaracteristicaRepositoryInterface
     public function delete(int $id): bool;
 
     public function allByFactor(int $id): Collection;
+
+    /** Carga la característica con toda la jerarquía necesaria para la vista de evaluación. */
+    public function findWithEvidencias(int $id): ?Model;
 }
