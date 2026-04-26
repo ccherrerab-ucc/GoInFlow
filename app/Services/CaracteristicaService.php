@@ -69,6 +69,7 @@ class CaracteristicaService
     {
         // S: auditoría delegada a AuditoriaService
         $datos = $this->auditoria->alCrear($datos);
+        $datos['status_id'] = $this->statusResolver->activo();
 
         $caracteristica = $this->repository->create($datos);
 

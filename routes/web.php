@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AuditoriaController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DepartamentoController;
 use App\Http\Controllers\FactorController;
@@ -15,9 +17,9 @@ use Illuminate\Support\Facades\Route;
     return view('welcome');
 });*/
 
-Route::get('/dashboard', function () {
+Route::get('/dashboards', function () {
     return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboards');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -26,18 +28,15 @@ Route::middleware('auth')->group(function () {
 });
 
 //rutas administrador
-Route::get('/administrator.app', function () {
-        return view('administrator.app');
-    })->name('administrator.app');
-
-Route::get('/inicio', function () { return view('administrator.dashboard');})->name('administrator.dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/inicio',    [DashboardController::class, 'index'])->name('administrator.dashboard');
 Route::get('/factor', function () { return view('administrator.factor');})->name('administrator.factor');
 Route::get('/caracteristicas2', function () { return view('VistaFactores2.Index');})->name('VistaFactores2.Index');
 Route::get('/aspectos_por_evaluar', function () { return view('administrator.aspectos_por_evaluar');})->name('administrator.aspectos_por_evaluar');
 //Route::get('/evidencias', function () { return view('administrator.evidencias');})->name('administrator.evidencias');
 Route::get('/resultados', function () { return view('administrator.resultados');})->name('administrator.resultados');
 Route::get('/admin_users', function () { return view('administrator.admin_users');})->name('administrator.admin_users');
-Route::get('/auditoria', function () { return view('administrator.auditoria');})->name('administrator.auditoria');
+Route::get('/auditoria', [AuditoriaController::class, 'index'])->name('administrator.auditoria');
 Route::get('/ayuda', function () { return view('administrator.ayuda');})->name('administrator.ayuda');
 
 

@@ -34,6 +34,7 @@ class FactorService
     {
         $datos['created_by'] = Auth::id();
         $datos['updated_by'] = Auth::id();
+        $datos['status_id']  = 1; // Activo al crear
         return $this->repository->create($datos);
     }
 

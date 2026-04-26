@@ -39,6 +39,13 @@ use App\Policies\AspectoPolicy;
 use App\Policies\EvidenciaPolicy;
 use App\Policies\ResultadoPolicy;
 
+// Observers
+use App\Observers\FactorObserver;
+use App\Observers\CaracteristicaObserver;
+use App\Observers\AspectoObserver;
+use App\Observers\EvidenciaObserver;
+use App\Observers\ResultadoObserver;
+
 class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
@@ -64,5 +71,16 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Aspecto::class, AspectoPolicy::class);
         Gate::policy(Evidencia::class, EvidenciaPolicy::class);
         Gate::policy(Resultado::class, ResultadoPolicy::class);
+
+        // Gates de dashboard (sin modelo asociado)
+        Gate::define('dashboard.view', fn($user) => true);
+        Gate::define('dashboard.view-global', fn($user) => $user->isAdmin() || $user->isDirector());
+
+        // Observers de auditoría — se disparan automáticamente en created/updated/deleted
+        Factor::observe(FactorObserver::class);
+        Caracteristica::observe(CaracteristicaObserver::class);
+        Aspecto::observe(AspectoObserver::class);
+        Evidencia::observe(EvidenciaObserver::class);
+        Resultado::observe(ResultadoObserver::class);
     }
 }

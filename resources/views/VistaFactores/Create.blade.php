@@ -103,7 +103,7 @@
                     <option value="">— Seleccionar —</option>
                     @foreach($statuses as $status)
                     <option value="{{ $status->id_status }}"
-                        {{ old('status_id', $factor->status_id ?? '') == $status->id_status ? 'selected' : '' }}>
+                        {{ old('status_id', 1) == $status->id_status ? 'selected' : '' }}>
                         {{ $status->name }}
                     </option>
                     @endforeach

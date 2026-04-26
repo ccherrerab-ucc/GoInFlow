@@ -31,6 +31,7 @@ class EvidenciaService
         $datos['created_by']   = Auth::id();
         $datos['updated_by']   = Auth::id();
         $datos['estado_actual'] = 1; // Borrador — estado inicial siempre
+        $datos['status_id']    = 1; // Activo al crear
         return $this->repository->create($datos);
     }
 

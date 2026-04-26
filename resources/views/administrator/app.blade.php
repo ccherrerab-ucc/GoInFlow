@@ -764,7 +764,7 @@
             <button class="gf-sidebar-toggle" id="sidebarToggle" aria-label="Menú">
                 <i class="bi bi-list"></i>
             </button>
-            <a class="gf-brand" href="{{ route('administrator.app') }}">
+            <a class="gf-brand" href="{{ route('dashboard') }}">
                 <div class="gf-brand-icon">
                     <i class="bi bi-folder2-open"></i>
                 </div>

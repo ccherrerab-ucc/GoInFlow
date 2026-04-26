@@ -6,6 +6,8 @@
 
 @php
     $estadoClases = [1 => 'borrador', 2 => 'revision', 3 => 'aprobado', 4 => 'rechazado'];
+    $estadoLabels = [1 => 'Borrador', 2 => 'En revisión', 3 => 'Aprobado', 4 => 'Rechazado'];
+    $estadoIconos = [1 => 'bi-file-earmark', 2 => 'bi-hourglass-split', 3 => 'bi-check-circle-fill', 4 => 'bi-x-circle-fill'];
 @endphp
 
 <div class="d-flex align-items-center justify-content-between mb-2">
@@ -29,62 +31,81 @@
 @endif
 
 <div class="gf-card p-0" style="overflow:hidden;">
-    <table class="gf-table">
+    <div class="gf-table-scroll">
+    <table class="gf-table gf-table-compact">
         <thead>
             <tr>
-                <th>#</th>
-                <th>Nombre</th>
-                <th>Aspecto / Característica</th>
-                <th>Período</th>
-                <th style="text-align:center;">Estado</th>
+                <th style="width:40px;">#</th>
+                <th style="width:25%;">Nombre</th>
+                <th style="width:22%;">Aspecto / Característica</th>
+                <th style="width:110px;white-space:nowrap;">Período</th>
+                <th style="width:120px;text-align:center;white-space:nowrap;">Estado</th>
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
             @forelse($evidencias as $e)
             @php
-                $estadoEv  = $e->estado_actual ?? 1;
-                $claseEv   = $estadoClases[$estadoEv] ?? 'borrador';
-                $labelEv   = [1=>'Borrador',2=>'En revisión',3=>'Aprobado',4=>'Rechazado'][$estadoEv] ?? 'Borrador';
-                $iconoEv   = [1=>'bi-file-earmark',2=>'bi-hourglass-split',3=>'bi-check-circle-fill',4=>'bi-x-circle-fill'][$estadoEv] ?? 'bi-file-earmark';
+                $estadoEv      = $e->estado_actual ?? 1;
+                $claseEv       = $estadoClases[$estadoEv] ?? 'borrador';
+                $labelEv       = $estadoLabels[$estadoEv] ?? 'Borrador';
+                $iconoEv       = $estadoIconos[$estadoEv] ?? 'bi-file-earmark';
                 $esMiEvidencia = auth()->id() == $e->created_by;
             @endphp
                 <tr>
-                    <td>{{ $e->id_evidencia }}</td>
-                    <td style="font-weight:500;max-width:200px;">
-                        {{ $e->nombre }}
+                    {{-- # --}}
+                    <td style="color:var(--gray-400);">{{ $e->id_evidencia }}</td>
+
+                    {{-- Nombre --}}
+                    <td style="max-width:0;">
+                        <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+                                    font-weight:500;" title="{{ $e->nombre }}">
+                            {{ $e->nombre }}
+                        </div>
                         @if($e->descripcion)
-                            <div style="font-size:11px;color:var(--gray-500);font-weight:400;
-                                        white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px;">
+                            <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+                                        font-size:11px;color:var(--gray-400);" title="{{ $e->descripcion }}">
                                 {{ $e->descripcion }}
                             </div>
                         @endif
                     </td>
-                    <td>
-                        <div style="font-size:12px;line-height:1.4;">
-                            @if($e->aspecto)
-                                <span style="color:var(--gray-500);font-size:11px;">
-                                    {{ $e->aspecto->caracteristica?->name ?? '—' }}
-                                </span><br>
-                                <strong>{{ $e->aspecto->name }}</strong>
-                            @else
-                                <span style="color:var(--gray-400);">Sin aspecto</span>
-                            @endif
-                        </div>
+
+                    {{-- Aspecto / Característica --}}
+                    <td style="max-width:0;">
+                        @if($e->aspecto)
+                            <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+                                        font-size:11px;color:var(--gray-400);"
+                                 title="{{ $e->aspecto->caracteristica?->name ?? '' }}">
+                                {{ $e->aspecto->caracteristica?->name ?? '—' }}
+                            </div>
+                            <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+                                        font-weight:500;"
+                                 title="{{ $e->aspecto->name }}">
+                                {{ $e->aspecto->name }}
+                            </div>
+                        @else
+                            <span style="color:var(--gray-400);">Sin aspecto</span>
+                        @endif
                     </td>
-                    <td style="font-size:12px;white-space:nowrap;">
+
+                    {{-- Período --}}
+                    <td style="white-space:nowrap;">
                         {{ $e->fecha_inicio?->format('d/m/Y') ?? '—' }}<br>
-                        <span style="color:var(--gray-500);">{{ $e->fecha_fin?->format('d/m/Y') ?? '—' }}</span>
+                        <span style="color:var(--gray-400);">{{ $e->fecha_fin?->format('d/m/Y') ?? '—' }}</span>
                     </td>
-                    <td style="text-align:center;">
+
+                    {{-- Estado --}}
+                    <td style="text-align:center;white-space:nowrap;">
                         <span class="gf-status gf-status-{{ $claseEv }}">
                             <i class="bi {{ $iconoEv }} me-1"></i>{{ $labelEv }}
                         </span>
                     </td>
-                    <td>
-                        <div class="d-flex gap-1 flex-wrap">
 
-                            {{-- Enviar a revisión (solo Borrador + creador) --}}
+                    {{-- Acciones --}}
+                    <td style="white-space:nowrap;">
+                        <div class="d-flex gap-1">
+
+                            {{-- Enviar a revisión (Borrador + creador) --}}
                             @if($estadoEv == 1 && $esMiEvidencia)
                                 <form action="{{ route('flujo.iniciar', $e->id_evidencia) }}"
                                       method="POST"
@@ -98,17 +119,7 @@
                                 </form>
                             @endif
 
-                            {{-- Editar (Borrador o Rechazado + creador) --}}
-                            @if(in_array($estadoEv, [1, 4]) && $esMiEvidencia)
-                                <a href="{{ route('evidencias.edit', $e->id_evidencia) }}"
-                                   class="gf-btn gf-btn-outline"
-                                   style="height:30px;padding:0 10px;font-size:12px;"
-                                   title="Editar">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                            @endif
-
-                            {{-- Volver a enviar (Rechazado + creador) --}}
+                            {{-- Reenviar (Rechazado + creador) --}}
                             @if($estadoEv == 4 && $esMiEvidencia)
                                 <form action="{{ route('flujo.reiniciar', $e->id_evidencia) }}"
                                       method="POST"
@@ -120,6 +131,16 @@
                                         <i class="bi bi-arrow-clockwise"></i> Reenviar
                                     </button>
                                 </form>
+                            @endif
+
+                            {{-- Editar (Borrador o Rechazado + creador) --}}
+                            @if(in_array($estadoEv, [1, 4]) && $esMiEvidencia)
+                                <a href="{{ route('evidencias.edit', $e->id_evidencia) }}"
+                                   class="gf-btn gf-btn-outline"
+                                   style="height:30px;padding:0 10px;font-size:12px;"
+                                   title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
                             @endif
 
                             {{-- Eliminar --}}
@@ -157,6 +178,7 @@
             @endforelse
         </tbody>
     </table>
+    </div>
 </div>
 
 @endsection
