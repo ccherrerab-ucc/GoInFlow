@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -34,7 +35,7 @@
             box-shadow: 0 4px 24px rgba(12, 68, 124, 0.12);
         }
 
-        .panel-brand {
+        /*.panel-brand {
             width: 42%;
             background: #0C447C;
             color: white;
@@ -43,12 +44,52 @@
             justify-content: center;
             align-items: center;
             gap: 10px;
+        }*/
+
+        .panel-brand {
+            width: 42%;
+            background: #0067ad;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            text-align: center;
+            padding: 2rem 1.5rem;
+        }
+
+        .panel-brand .logo-universidad {
+            max-height: 100px;
+            width: auto;
+            margin-bottom: 0.5rem;
+        }
+
+        .panel-brand .logo-universidad-white {
+            filter: brightness(0) invert(1);
+        }
+
+        /* Ajuste para el logo en blanco sobre fondo azul */
+        .panel-brand img {
+            max-height: 80px;
+            object-fit: contain;
+        }
+
+        .panel-brand img.brand-logo-white {
+            filter: brightness(0) invert(1);
         }
 
         .panel-form {
             flex: 1;
-            background: white;
+            background: #ffffff;
             padding: 40px;
+            
+        }
+        .panel-form .logo-universidad {
+            max-height: 120px;
+            width: auto;
+            margin-bottom: 0.5rem;
+            text-align: center;
         }
 
         .form-control-goinflow {
@@ -66,7 +107,6 @@
             border-radius: 8px;
             padding: 10px;
         }
-
     </style>
 </head>
 
@@ -77,4 +117,5 @@
     </div>
 
 </body>
+
 </html>
