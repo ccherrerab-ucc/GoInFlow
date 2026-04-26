@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ResultadoRequest;
+use App\Models\Aspecto;
+use App\Models\Caracteristica;
+use App\Models\Factor;
 use App\Models\Resultado;
 use App\Models\StatusCna;
 use App\Services\ResultadoService;
@@ -81,8 +84,12 @@ class ResultadoController extends Controller
     private function formData(): array
     {
         return [
-            'statuses'       => StatusCna::all(),
-            'tiposRelacion'  => ['factor', 'caracteristica', 'aspecto'],
+            'statuses'        => StatusCna::all(),
+            'tiposRelacion'   => ['factor', 'caracteristica', 'aspecto'],
+            'factores'        => Factor::orderBy('name')->get(['id_factor', 'name']),
+            'caracteristicas' => Caracteristica::orderBy('name')->get(['id_caracteristica', 'name']),
+            'aspectos'        => Aspecto::with('caracteristica:id_caracteristica,name')
+                                    ->orderBy('name')->get(['id_aspecto', 'name', 'caracteristica_id']),
         ];
     }
 }

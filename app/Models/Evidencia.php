@@ -56,4 +56,14 @@ class Evidencia extends Model
     {
         return $this->hasMany(FlujoEjecucion::class, 'id_evidencia', 'id_evidencia');
     }
+
+    public function resultados()
+    {
+        return $this->belongsToMany(
+            \App\Models\Resultado::class,
+            'resultado_evidencia',
+            'evidencia_id',
+            'resultado_id'
+        )->withPivot('anexado_por');
+    }
 }

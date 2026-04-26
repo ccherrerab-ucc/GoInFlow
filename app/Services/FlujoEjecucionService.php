@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Caracteristica;
 use App\Models\Evidencia;
 use App\Models\Flujo;
 use App\Models\FlujoEjecucion;
@@ -13,17 +14,16 @@ use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
 /**
- * Principio: Responsabilidad Única — orquesta exclusivamente el flujo de aprobación.
- * Usa modelos directamente (no repositorios) porque la lógica es transaccional
- * y requiere coordinar múltiples tablas en una sola unidad de trabajo.
+ * Orquesta el flujo de aprobación de evidencias.
+ * Aprobador = siempre el responsable de la característica.
+ * El flujo se auto-crea al primer envío si no existe.
  */
 class FlujoEjecucionService
 {
     /**
-     * Envía una evidencia a revisión iniciando el flujo configurado para su aspecto.
-     * Solo aplica si la evidencia está en Borrador y no tiene un flujo activo.
-     *
-     * @throws RuntimeException si el aspecto no tiene flujo activo o el flujo no tiene pasos.
+     * Envía una evidencia a revisión.
+     * Requiere que esté en Borrador y sin flujo activo.
+     * El flujo se auto-genera ligado al responsable de la característica.
      */
     public function iniciarFlujo(Evidencia $evidencia): void
     {
@@ -31,51 +31,40 @@ class FlujoEjecucionService
             throw new RuntimeException('Solo se puede enviar a revisión una evidencia en estado Borrador.');
         }
 
-        $tieneFlujoActivo = FlujoEjecucion::where('id_evidencia', $evidencia->id_evidencia)
-            ->whereNull('finalizado_at')
-            ->exists();
-
-        if ($tieneFlujoActivo) {
+        if (FlujoEjecucion::where('id_evidencia', $evidencia->id_evidencia)->whereNull('finalizado_at')->exists()) {
             throw new RuntimeException('Esta evidencia ya tiene un flujo de aprobación en curso.');
         }
 
-        $flujo      = $this->resolverFlujoParaEvidencia($evidencia);
-        $primerPaso = $flujo->pasos()->orderBy('orden')->first();
-
-        if (!$primerPaso) {
-            throw new RuntimeException('El flujo configurado no tiene pasos. Contacta al responsable del aspecto.');
-        }
+        $aspecto        = $this->cargarAspecto($evidencia);
+        $caracteristica = $this->cargarCaracteristica($aspecto);
+        $flujo          = $this->obtenerOCrearFlujo($caracteristica);
+        $primerPaso     = $flujo->pasos()->first();
 
         DB::transaction(function () use ($evidencia, $flujo, $primerPaso) {
             $ejecucion = FlujoEjecucion::create([
                 'id_evidencia'  => $evidencia->id_evidencia,
                 'id_flujo'      => $flujo->id_flujo,
                 'paso_actual'   => $primerPaso->id_paso,
-                'estado_actual' => 2, // En revisión
+                'estado_actual' => 2,
                 'iniciado_at'   => now(),
             ]);
 
             $evidencia->update(['estado_actual' => 2]);
-
             $this->registrarHistorial($ejecucion, $primerPaso, 'iniciado', null);
         });
     }
 
     /**
-     * Procesa la decisión (aprobado / rechazado) del aprobador actual.
-     * Valida que el usuario tiene el rol requerido para el paso vigente.
-     *
-     * @throws AuthorizationException si el usuario no tiene el rol correcto.
-     * @throws RuntimeException       si no hay flujo activo para la evidencia.
+     * Procesa la decisión del responsable de la característica (aprobado/rechazado).
      */
     public function procesarDecision(int $evidenciaId, string $decision, ?string $comentario): void
     {
         $ejecucion = FlujoEjecucion::where('id_evidencia', $evidenciaId)
             ->whereNull('finalizado_at')
-            ->with(['pasoActual', 'evidencia'])
+            ->with(['pasoActual', 'evidencia.aspecto.caracteristica'])
             ->firstOrFail();
 
-        $this->verificarRolAprobador($ejecucion->pasoActual);
+        $this->verificarEsResponsable($ejecucion->evidencia);
 
         DB::transaction(function () use ($ejecucion, $decision, $comentario) {
             $evidencia  = $ejecucion->evidencia;
@@ -85,43 +74,28 @@ class FlujoEjecucionService
 
             if ($decision === 'rechazado') {
                 $evidencia->update(['estado_actual' => 4]);
-                $ejecucion->update([
-                    'estado_actual' => 4,
-                    'paso_actual'   => null,
-                    'finalizado_at' => now(),
-                ]);
+                $ejecucion->update(['estado_actual' => 4, 'paso_actual' => null, 'finalizado_at' => now()]);
                 return;
             }
 
-            // Aprobado: buscar siguiente paso
+            // Aprobado: avanzar al siguiente paso si existe
             $siguientePaso = FlujoPaso::where('id_flujo', $ejecucion->id_flujo)
                 ->where('orden', '>', $pasoActual->orden)
                 ->orderBy('orden')
                 ->first();
 
             if ($siguientePaso) {
-                $ejecucion->update([
-                    'paso_actual'   => $siguientePaso->id_paso,
-                    'estado_actual' => 2, // Sigue En revisión
-                ]);
+                $ejecucion->update(['paso_actual' => $siguientePaso->id_paso, 'estado_actual' => 2]);
                 $this->registrarHistorial($ejecucion, $siguientePaso, 'avanzado', null);
             } else {
-                // Último paso: evidencia aprobada
                 $evidencia->update(['estado_actual' => 3]);
-                $ejecucion->update([
-                    'estado_actual' => 3,
-                    'paso_actual'   => null,
-                    'finalizado_at' => now(),
-                ]);
+                $ejecucion->update(['estado_actual' => 3, 'paso_actual' => null, 'finalizado_at' => now()]);
             }
         });
     }
 
     /**
-     * Reinicia el flujo desde el primer paso después de una corrección.
-     * Solo aplica si la evidencia está en estado Rechazado.
-     *
-     * @throws RuntimeException si la evidencia no está rechazada.
+     * Reinicia el flujo desde el primer paso tras corrección del creador.
      */
     public function reiniciarFlujo(int $evidenciaId): void
     {
@@ -136,77 +110,104 @@ class FlujoEjecucionService
             throw new RuntimeException('Solo se puede reiniciar el flujo de una evidencia rechazada.');
         }
 
-        $primerPaso = $ejecucion->flujo->pasos()->orderBy('orden')->first();
+        $primerPaso = $ejecucion->flujo->pasos()->first();
 
         if (!$primerPaso) {
             throw new RuntimeException('El flujo no tiene pasos configurados.');
         }
 
         DB::transaction(function () use ($ejecucion, $evidencia, $primerPaso) {
-            $ejecucion->update([
-                'paso_actual'   => $primerPaso->id_paso,
-                'estado_actual' => 2,
-                'finalizado_at' => null,
-            ]);
-
+            $ejecucion->update(['paso_actual' => $primerPaso->id_paso, 'estado_actual' => 2, 'finalizado_at' => null]);
             $evidencia->update(['estado_actual' => 2]);
-
             $this->registrarHistorial($ejecucion, $primerPaso, 'reiniciado', null);
         });
     }
 
-    /* ── Métodos privados de soporte ─────────────────────────── */
+    /* ── Privados ──────────────────────────────────────────────── */
 
     /**
-     * Resuelve el flujo activo para una evidencia usando herencia:
-     *   1. Flujo específico del Aspecto (override futuro)
-     *   2. Flujo default de la Característica padre
-     *
-     * @throws RuntimeException si no hay ningún flujo activo configurado.
+     * Obtiene el flujo de la característica; si no existe lo crea con un único paso
+     * cuyo aprobador es el responsable de la característica.
      */
-    private function resolverFlujoParaEvidencia(Evidencia $evidencia): Flujo
+    private function obtenerOCrearFlujo(Caracteristica $caracteristica): Flujo
     {
-        // 1. Override por aspecto
-        $flujo = Flujo::where('id_aspecto', $evidencia->id_aspecto)
+        $flujo = Flujo::where('id_caracteristica', $caracteristica->id_caracteristica)
+            ->whereNull('id_aspecto')
             ->where('activo', true)
             ->with('pasos')
             ->first();
 
-        // 2. Fallback al flujo de la característica
-        if (!$flujo) {
-            $aspecto = $evidencia->relationLoaded('aspecto')
-                ? $evidencia->aspecto
-                : $evidencia->aspecto()->first();
-
-            $flujo = Flujo::where('id_caracteristica', $aspecto?->caracteristica_id)
-                ->whereNull('id_aspecto')
-                ->where('activo', true)
-                ->with('pasos')
-                ->first();
+        if ($flujo && $flujo->pasos->isNotEmpty()) {
+            return $flujo;
         }
 
-        if (!$flujo) {
-            throw new RuntimeException(
-                'No hay flujo de aprobación configurado para esta evidencia. ' .
-                'Solicita al responsable de la característica que configure el flujo.'
-            );
+        $responsable = $caracteristica->responsableUser
+            ?? $caracteristica->responsableUser()->first();
+
+        if (!$responsable) {
+            throw new RuntimeException('La característica no tiene un responsable asignado. Contacta al administrador.');
         }
 
-        return $flujo;
+        if (!$responsable->id_rol) {
+            throw new RuntimeException('El responsable de la característica no tiene un rol asignado.');
+        }
+
+        return DB::transaction(function () use ($caracteristica, $responsable, $flujo) {
+            if (!$flujo) {
+                $flujo = Flujo::create([
+                    'nombre'            => 'Aprobación — ' . $caracteristica->name,
+                    'id_caracteristica' => $caracteristica->id_caracteristica,
+                    'id_aspecto'        => null,
+                    'activo'            => true,
+                ]);
+            }
+
+            FlujoPaso::create([
+                'id_flujo'             => $flujo->id_flujo,
+                'orden'                => 1,
+                'rol_requerido'        => $responsable->id_rol,
+                'cantidad_aprobadores' => 1,
+            ]);
+
+            return $flujo->load('pasos');
+        });
     }
 
     /**
-     * Valida que el usuario autenticado tiene el rol requerido para aprobar el paso actual.
+     * Valida que el usuario autenticado es el responsable de la característica
+     * a la que pertenece la evidencia.
      *
-     * @throws AuthorizationException si el rol no coincide.
+     * @throws AuthorizationException
      */
-    private function verificarRolAprobador(FlujoPaso $paso): void
+    private function verificarEsResponsable(Evidencia $evidencia): void
     {
-        if (Auth::user()->id_rol !== $paso->rol_requerido) {
+        $caracteristica = $evidencia->aspecto?->caracteristica;
+
+        if (!$caracteristica || Auth::id() !== (int) $caracteristica->responsable) {
             throw new AuthorizationException(
-                'No tienes el rol requerido para tomar decisiones en este paso del flujo.'
+                'Solo el responsable de la característica puede aprobar o rechazar esta evidencia.'
             );
         }
+    }
+
+    private function cargarAspecto(Evidencia $evidencia)
+    {
+        return $evidencia->relationLoaded('aspecto')
+            ? $evidencia->aspecto
+            : $evidencia->aspecto()->firstOrFail();
+    }
+
+    private function cargarCaracteristica($aspecto): Caracteristica
+    {
+        $caracteristica = $aspecto->relationLoaded('caracteristica')
+            ? $aspecto->caracteristica
+            : $aspecto->caracteristica()->firstOrFail();
+
+        if (!$caracteristica) {
+            throw new RuntimeException('El aspecto no está asociado a una característica.');
+        }
+
+        return $caracteristica;
     }
 
     private function registrarHistorial(

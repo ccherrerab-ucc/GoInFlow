@@ -108,6 +108,20 @@
                                 </a>
                             @endif
 
+                            {{-- Volver a enviar (Rechazado + creador) --}}
+                            @if($estadoEv == 4 && $esMiEvidencia)
+                                <form action="{{ route('flujo.reiniciar', $e->id_evidencia) }}"
+                                      method="POST"
+                                      onsubmit="return confirm('¿Volver a enviar esta evidencia al flujo de aprobación?')">
+                                    @csrf
+                                    <button type="submit" class="gf-btn gf-btn-primary"
+                                            style="height:30px;padding:0 10px;font-size:12px;"
+                                            title="Volver a enviar">
+                                        <i class="bi bi-arrow-clockwise"></i> Reenviar
+                                    </button>
+                                </form>
+                            @endif
+
                             {{-- Eliminar --}}
                             @can('delete', $e)
                                 <form action="{{ route('evidencias.destroy', $e->id_evidencia) }}"

@@ -165,7 +165,11 @@ class InitialSetupSeeder extends Seeder
         DB::table('factors')->insert([
             [
                 'name' => 'ESTRUCTURA Y PROCESOS ACADÉMICOS',
-                'description' => 'Descripción del factor 1',
+                'description' => 'Las instituciones deberán garantizar la efectividad e integridad de la articulación entre las políticas, procesos, y
+                procedimientos institucionales orientados a la gestión de los componentes formativos, pedagógicos, de evaluación, de
+                interacción y de relación social, así como de las actividades académicas y los procesos formativos que se concretan en la
+                oferta de programas académicos pertinentes y enmarcados en la universalidad del conocimiento.
+                ',
                 'fecha_inicio' => now(),
                 'fecha_fin' => now()->addMonths(6),
                 'status_id' => 1
@@ -175,24 +179,126 @@ class InitialSetupSeeder extends Seeder
         // CARACTERISTICA
         DB::table('caracteristicas')->insert([
             [
-                'name' => 'Característica 1',
-                'description' => 'Descripción de la característica',
+                'name' => 'Componentes formativos',
+                'description' => 'Característica 17. Componentes formativo',
                 'factor_id' => 1,
                 'fecha_inicio' => now(),
-                'fecha_fin' => now()->addMonths(6),
-                'status_id' => 1
-            ]
+                'fecha_fin' => now()->addMonths(36),
+                'status_id' => 1,
+                'responsable' => 1,
+            ],
+            [
+                'name' => 'Componentes pedagógicos y de evaluación.',
+                'description' => 'Característica 18. Componentes pedagógicos y de evaluación.',
+                'factor_id' => 1,
+                'fecha_inicio' => now(),
+                'fecha_fin' => now()->addMonths(36),
+                'status_id' => 1,
+                'responsable' => 1,
+            ],
+            [
+                'name' => 'Componente de interacción y relevancia social.',
+                'description' => 'Característica 19. Componente de interacción y relevancia social',
+                'factor_id' => 1,
+                'fecha_inicio' => now(),
+                'fecha_fin' => now()->addMonths(36),
+                'status_id' => 1,
+                'responsable' => 1,
+            ],
+            [
+                'name' => 'Procesos de creación, modificación y ampliación de programas académicos.',
+                'description' => 'Característica 20. Procesos de creación, modificación y ampliación de programas académicos.',
+                'factor_id' => 1,
+                'fecha_inicio' => now(),
+                'fecha_fin' => now()->addMonths(36),
+                'status_id' => 1,
+                'responsable' => 1,
+            ],
+
         ]);
 
         // ASPECTOS
         DB::table('aspectos')->insert([
             [
-                'name' => 'Aspecto 1',
-                'description' => 'Descripción del aspecto',
+                'name' => 'Medición y valoración del efecto de las políticas, estrategias, recursos, ambientes y capacidades orientadas a la gestión de los procesos curriculares y extracurriculares.',
+                'description' => 'Aspecto 41. Medición y valoración del efecto de las políticas, estrategias, recursos, ambientes y capacidades orientadas a la gestión de los procesos curriculares y extracurriculares.',
                 'caracteristica_id' => 1,
                 'fecha_inicio' => now(),
                 'fecha_fin' => now()->addMonths(6),
-                'status_id' => 1
+                'status_id' => 1,
+                'responsable' => 1,
+            ],
+            [
+                'name' => 'Apreciación de la comunidad sobre la eficiencia de políticas y estrategias institucionales para la formación integral, flexibilidad curricular, internacionalización e interdisciplinariedad.',
+                'description' => 'Aspecto 42. Apreciación de la comunidad sobre la eficiencia de políticas y estrategias institucionales para la formación integral, flexibilidad curricular, internacionalización e interdisciplinariedad.',
+                'caracteristica_id' => 1,
+                'fecha_inicio' => now(),
+                'fecha_fin' => now()->addMonths(6),
+                'status_id' => 1,
+                'responsable' => 1,
+            ],
+            [
+                'name' => 'Existencia de espacios de discusión y formación pedagógica para los profesores, orientados al logro de los resultados de aprendizaje, al mejoramiento continuo e innovación.',
+                'description' => 'Aspecto 43. Existencia de espacios de discusión y formación pedagógica para los profesores, orientados al logro de los resultados de aprendizaje, al mejoramiento continuo e innovación.',
+                'caracteristica_id' => 2,
+                'fecha_inicio' => now(),
+                'fecha_fin' => now()->addMonths(6),
+                'status_id' => 1,
+                'responsable' => 1,
+            ],
+            [
+                'name' => 'Evidencias y resultados de las discusiones y la formación pedagógica de los profesores.',
+                'description' => 'Aspecto 44. Evidencias y resultados de las discusiones y la formación pedagógica de los profesores.',
+                'caracteristica_id' => 2,
+                'fecha_inicio' => now(),
+                'fecha_fin' => now()->addMonths(6),
+                'status_id' => 1,
+                'responsable' => 1,
+            ],
+            [
+                'name' => 'Apreciación de la comunidad sobre seguimiento, evaluación y ajuste a las políticas, criterios y mecanismos de evaluación estudiantil.',
+                'description' => 'Aspecto 45. Apreciación de la comunidad sobre seguimiento, evaluación y ajuste a las políticas, criterios y mecanismos de evaluación estudiantil.',
+                'caracteristica_id' => 2,
+                'fecha_inicio' => now(),
+                'fecha_fin' => now()->addMonths(6),
+                'status_id' => 1,
+                'responsable' => 1,
+            ],
+            [
+                'name' => 'Correspondencia entre los perfiles formativos y los objetivos de los programas académicos con las necesidades de formación profesional y laboral en contexto regional, nacional e internacional.',
+                'description' => 'Aspecto 46. Correspondencia entre los perfiles formativos y los objetivos de los programas académicos con las necesidades de formación profesional y laboral en contexto regional, nacional e internacional.',
+                'caracteristica_id' => 3,
+                'fecha_inicio' => now(),
+                'fecha_fin' => now()->addMonths(6),
+                'status_id' => 1,
+                'responsable' => 1,
+            ],
+            [
+                'name' => 'Efecto de la evaluación sistemática y estructurada de las necesidades del contexto sobre la formación ofrecida.',
+                'description' => 'Aspecto 47. Efecto de la evaluación sistemática y estructurada de las necesidades del contexto sobre la formación ofrecida.',
+                'caracteristica_id' => 3,
+                'fecha_inicio' => now(),
+                'fecha_fin' => now()->addMonths(6),
+                'status_id' => 1,
+                'responsable' => 1,
+            ],
+            [
+                'name' => 'Aplicación de políticas y procedimientos para la creación, modificación y ampliación de programas académicos.',
+                'description' => 'Aspecto 48. Aplicación de políticas y procedimientos para la creación, modificación y ampliación de programas académicos.',
+                'caracteristica_id' => 4,
+                'fecha_inicio' => now(),
+                'fecha_fin' => now()->addMonths(6),
+                'status_id' => 1,
+                'responsable' => 1,
+            ],
+            [
+                'name' => 'Apreciación de la comunidad sobre la eficiencia de estas políticas y procedimientos.',
+                'description' => 'Aspecto 49. Apreciación de la comunidad sobre la eficiencia de estas políticas y procedimientos.',
+                'caracteristica_id' => 4,
+                'fecha_inicio' => now(),
+                'fecha_fin' => now()->addMonths(6),
+                'status_id' => 1,
+                'responsable' => 1,
             ]
         ]);
     }

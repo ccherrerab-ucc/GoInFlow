@@ -15,7 +15,8 @@
 </div>
 
 <div class="gf-card p-0" style="overflow:hidden;">
-    <table class="gf-table">
+    <div class="gf-table-scroll">
+    <table class="gf-table gf-table-compact">
         <thead>
             <tr>
                 <th>#</th>
@@ -98,6 +99,7 @@
             @endforelse
         </tbody>
     </table>
+    </div>
 </div>
 
 @endsection

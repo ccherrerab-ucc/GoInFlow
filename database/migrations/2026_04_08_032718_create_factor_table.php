@@ -18,8 +18,8 @@ return new class extends Migration
         });
         Schema::create('factors', function (Blueprint $table) {
             $table->id('id_factor');
-            $table->string('name');
-            $table->string('description')->nullable();
+            $table->string('name', 500);
+            $table->text('description')->nullable();
             $table->foreignId('responsable')->nullable()->constrained('users', 'id');
             $table->dateTime('fecha_inicio');
             $table->dateTime('fecha_fin');
@@ -31,8 +31,8 @@ return new class extends Migration
 
         Schema::create('caracteristicas', function (Blueprint $table) {
             $table->id('id_caracteristica');
-            $table->string('name');
-            $table->string('description')->nullable();
+            $table->string('name', 500);
+            $table->text('description')->nullable();
             $table->foreignId('factor_id')->constrained('factors', 'id_factor');
             $table->foreignId('responsable')->nullable()->constrained('users', 'id');
             $table->dateTime('fecha_inicio');
@@ -45,8 +45,8 @@ return new class extends Migration
 
         Schema::create('aspectos', function (Blueprint $table) {
             $table->id('id_aspecto');
-            $table->string('name');
-            $table->string('description')->nullable();
+            $table->string('name', 500);
+            $table->text('description')->nullable();
             $table->foreignId('caracteristica_id')->constrained('caracteristicas', 'id_caracteristica');
             $table->foreignId('responsable')->nullable()->constrained('users', 'id');
             $table->dateTime('fecha_inicio');

@@ -18,7 +18,8 @@ class ResultadoRepository implements ResultadoRepositoryInterface
     public function all(): Collection
     {
         return $this->model
-            ->with(['status', 'createdBy', 'updatedBy'])
+            ->with(['status', 'createdBy'])
+            ->withCount('evidencias')
             ->orderBy('id_resultado', 'desc')
             ->get();
     }

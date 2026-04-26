@@ -71,6 +71,7 @@ class CaracteristicaRepository implements CaracteristicaRepositoryInterface
                 'aspectos.evidencias.estadoActual',
                 'aspectos.evidencias.status',
                 'aspectos.evidencias.createdBy',
+                'aspectos.evidencias.resultados',
                 'aspectos.evidencias.flujoEjecuciones' => fn ($q) => $q
                     ->orderByDesc('id_ejecucion')
                     ->with([
