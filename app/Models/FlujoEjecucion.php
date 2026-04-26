@@ -14,6 +14,12 @@ class FlujoEjecucion extends Model
         'id_evidencia', 'id_version', 'id_flujo', 'paso_actual', 'estado_actual', 'iniciado_at', 'finalizado_at'
     ];
 
+    protected $casts = [
+        'estado_actual' => 'integer',
+        'iniciado_at'   => 'datetime',
+        'finalizado_at' => 'datetime',
+    ];
+
     public function evidencia()
     {
         return $this->belongsTo(Evidencia::class, 'id_evidencia', 'id_evidencia');

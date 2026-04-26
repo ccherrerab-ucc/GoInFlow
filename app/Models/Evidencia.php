@@ -17,8 +17,9 @@ class Evidencia extends Model
     ];
 
     protected $casts = [
-        'fecha_inicio' => 'datetime',
-        'fecha_fin'    => 'datetime',
+        'fecha_inicio'  => 'datetime',
+        'fecha_fin'     => 'datetime',
+        'estado_actual' => 'integer',
     ];
 
     public function estadoActual()

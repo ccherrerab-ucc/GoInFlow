@@ -158,21 +158,37 @@ class FlujoEjecucionService
     /* ── Métodos privados de soporte ─────────────────────────── */
 
     /**
-     * Busca el flujo activo configurado para el aspecto de la evidencia.
+     * Resuelve el flujo activo para una evidencia usando herencia:
+     *   1. Flujo específico del Aspecto (override futuro)
+     *   2. Flujo default de la Característica padre
      *
-     * @throws RuntimeException si el aspecto no tiene flujo activo.
+     * @throws RuntimeException si no hay ningún flujo activo configurado.
      */
     private function resolverFlujoParaEvidencia(Evidencia $evidencia): Flujo
     {
+        // 1. Override por aspecto
         $flujo = Flujo::where('id_aspecto', $evidencia->id_aspecto)
             ->where('activo', true)
             ->with('pasos')
             ->first();
 
+        // 2. Fallback al flujo de la característica
+        if (!$flujo) {
+            $aspecto = $evidencia->relationLoaded('aspecto')
+                ? $evidencia->aspecto
+                : $evidencia->aspecto()->first();
+
+            $flujo = Flujo::where('id_caracteristica', $aspecto?->caracteristica_id)
+                ->whereNull('id_aspecto')
+                ->where('activo', true)
+                ->with('pasos')
+                ->first();
+        }
+
         if (!$flujo) {
             throw new RuntimeException(
-                'El aspecto asociado a esta evidencia no tiene un flujo de aprobación activo. ' .
-                'Solicita al responsable del aspecto que configure el flujo.'
+                'No hay flujo de aprobación configurado para esta evidencia. ' .
+                'Solicita al responsable de la característica que configure el flujo.'
             );
         }
 

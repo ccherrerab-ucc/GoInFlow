@@ -140,6 +140,13 @@ return new class extends Migration
             $table->id('id_flujo');
             $table->string('nombre');
 
+            // Flujo a nivel de Característica (default heredado por todos sus aspectos)
+            $table->unsignedBigInteger('id_caracteristica')->nullable();
+            $table->foreign('id_caracteristica')
+                  ->references('id_caracteristica')->on('caracteristicas')
+                  ->nullOnDelete();
+
+            // Flujo a nivel de Aspecto (override específico — uso futuro)
             $table->unsignedBigInteger('id_aspecto')->nullable();
             $table->foreign('id_aspecto')
                   ->references('id_aspecto')->on('aspectos')

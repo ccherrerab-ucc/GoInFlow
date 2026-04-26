@@ -26,7 +26,7 @@ class CaracteristicaRepository implements CaracteristicaRepositoryInterface
     public function findById(int $id): ?Model
     {
         return $this->model
-            ->with(['factor', 'status', 'responsableUser', 'aspectos'])
+            ->with(['factor', 'status', 'responsableUser', 'aspectos', 'flujoActivo.pasos'])
             ->findOrFail($id);
     }
 
@@ -66,13 +66,19 @@ class CaracteristicaRepository implements CaracteristicaRepositoryInterface
                 'responsableUser',
                 'aspectos.responsableUser',
                 'aspectos.status',
-                'aspectos.flujoActivo',
+                'flujoActivo.pasos.rolRequerido',
+                'aspectos.flujoActivo.pasos.rolRequerido',
                 'aspectos.evidencias.estadoActual',
                 'aspectos.evidencias.status',
                 'aspectos.evidencias.createdBy',
                 'aspectos.evidencias.flujoEjecuciones' => fn ($q) => $q
-                    ->whereNull('finalizado_at')
-                    ->with('pasoActual'),
+                    ->orderByDesc('id_ejecucion')
+                    ->with([
+                        'pasoActual.rolRequerido',
+                        'historial' => fn ($h) => $h
+                            ->orderBy('fecha')
+                            ->with(['usuario', 'paso.rolRequerido']),
+                    ]),
             ])
             ->findOrFail($id);
     }

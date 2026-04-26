@@ -2,10 +2,13 @@
 
 namespace App\Services;
 
+use App\Models\Flujo;
+use App\Models\FlujoPaso;
 use App\Repositories\Contracts\CaracteristicaRepositoryInterface;
 use App\Services\Contracts\StatusResolverInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 /**
  * ─────────────────────────────────────────────────────────────
@@ -93,6 +96,47 @@ class CaracteristicaService
         );
 
         return $actualizada;
+    }
+
+    /**
+     * Crea o reemplaza el flujo de aprobación default de la característica.
+     * Si ya existe un flujo activo para la característica, elimina sus pasos y los recrea.
+     * Requiere al menos un paso con rol_requerido para ser persistido.
+     */
+    public function guardarFlujo(int $caracteristicaId, array $flujoData): void
+    {
+        $pasos = array_filter($flujoData['pasos'] ?? [], fn ($p) => !empty($p['rol_requerido']));
+
+        if (empty($pasos)) {
+            return;
+        }
+
+        DB::transaction(function () use ($caracteristicaId, $flujoData, $pasos) {
+            $flujo = Flujo::where('id_caracteristica', $caracteristicaId)
+                          ->whereNull('id_aspecto')
+                          ->first();
+
+            if ($flujo) {
+                $flujo->update(['nombre' => $flujoData['nombre'] ?? $flujo->nombre, 'activo' => true]);
+                $flujo->pasos()->delete();
+            } else {
+                $flujo = Flujo::create([
+                    'nombre'            => $flujoData['nombre'] ?? 'Flujo de aprobación',
+                    'id_caracteristica' => $caracteristicaId,
+                    'id_aspecto'        => null,
+                    'activo'            => true,
+                ]);
+            }
+
+            foreach (array_values($pasos) as $i => $paso) {
+                FlujoPaso::create([
+                    'id_flujo'             => $flujo->id_flujo,
+                    'orden'                => $i + 1,
+                    'rol_requerido'        => $paso['rol_requerido'],
+                    'cantidad_aprobadores' => 1,
+                ]);
+            }
+        });
     }
 
     /**

@@ -58,16 +58,26 @@
             </div>
 
             <!-- REMEMBER -->
-            <div class="mb-3">
+            <!--<div class="mb-3">
                 <input type="checkbox" name="remember">
                 Recordarme
-            </div>
+            </div>-->
 
             <!-- FORGOT -->
-            @if (Route::has('password.request'))
+            <!--@if (Route::has('password.request'))
                 <div class="mb-3">
                     <a href="{{ route('password.request') }}">
                         ¿Olvidaste tu contraseña?
+                    </a>
+                </div>
+            @endif-->
+
+            <!-- REGISTER -->
+            @if (Route::has('register'))
+                <div class="mb-3">
+                    <span class="text-muted">¿No tienes cuenta?</span>
+                    <a href="{{ route('register') }}">
+                        Regístrate aquí
                     </a>
                 </div>
             @endif

@@ -163,8 +163,8 @@ class InitialSetupSeeder extends Seeder
 
         // FACTOR
         DB::table('factors')->insert([
-            [                
-                'name' => 'Factor 1',
+            [
+                'name' => 'ESTRUCTURA Y PROCESOS ACADÉMICOS',
                 'description' => 'Descripción del factor 1',
                 'fecha_inicio' => now(),
                 'fecha_fin' => now()->addMonths(6),
@@ -186,7 +186,7 @@ class InitialSetupSeeder extends Seeder
 
         // ASPECTOS
         DB::table('aspectos')->insert([
-            [            
+            [
                 'name' => 'Aspecto 1',
                 'description' => 'Descripción del aspecto',
                 'caracteristica_id' => 1,

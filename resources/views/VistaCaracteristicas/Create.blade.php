@@ -142,6 +142,81 @@
             </div>
         </div>
 
+        {{-- ══ Flujo de aprobación ══ --}}
+        <hr style="border-color:var(--gray-100);margin:8px 0 20px;">
+        <div style="margin-bottom:6px;">
+            <div style="font-size:14px;font-weight:700;color:var(--primary);">
+                <i class="bi bi-diagram-3 me-2"></i>Flujo de aprobación
+            </div>
+            <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">
+                Define qué roles deben aprobar las evidencias de esta característica, en orden.
+                Puedes configurarlo ahora o más tarde editando la característica.
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="gf-label" for="flujo_nombre">Nombre del flujo</label>
+            <input type="text"
+                   id="flujo_nombre"
+                   name="flujo[nombre]"
+                   class="gf-input"
+                   value="{{ old('flujo.nombre', 'Flujo de aprobación') }}"
+                   placeholder="Ej. Aprobación estándar">
+        </div>
+
+        <div style="margin-bottom:8px;font-size:12px;font-weight:600;color:var(--gray-600);">
+            Pasos del flujo <span style="font-weight:400;color:var(--gray-400);">(en orden de aprobación)</span>
+        </div>
+
+        <div id="pasos-container">
+            @forelse(old('flujo.pasos', []) as $i => $paso)
+            <div class="paso-row d-flex align-items-center gap-2 mb-2">
+                <span style="width:24px;text-align:center;font-size:13px;font-weight:700;
+                             color:var(--primary);flex-shrink:0;" class="paso-orden">{{ $i + 1 }}</span>
+                <select name="flujo[pasos][{{ $i }}][rol_requerido]"
+                        class="gf-select" style="flex:1;" required>
+                    <option value="">— Rol aprobador —</option>
+                    @foreach($roles as $rol)
+                        <option value="{{ $rol->id_rol }}"
+                            {{ $paso['rol_requerido'] == $rol->id_rol ? 'selected' : '' }}>
+                            {{ $rol->name }}
+                        </option>
+                    @endforeach
+                </select>
+                <button type="button" class="gf-btn gf-btn-danger btn-quitar-paso"
+                        style="height:34px;padding:0 10px;font-size:12px;flex-shrink:0;">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+            @empty
+            {{-- plantilla vacía: el JS la clona --}}
+            @endforelse
+        </div>
+
+        <button type="button" id="btn-agregar-paso"
+                class="gf-btn gf-btn-outline"
+                style="font-size:12px;height:34px;padding:0 14px;margin-bottom:20px;">
+            <i class="bi bi-plus-lg me-1"></i> Agregar paso
+        </button>
+
+        {{-- Plantilla oculta para clonar --}}
+        <template id="tpl-paso">
+            <div class="paso-row d-flex align-items-center gap-2 mb-2">
+                <span style="width:24px;text-align:center;font-size:13px;font-weight:700;
+                             color:var(--primary);flex-shrink:0;" class="paso-orden"></span>
+                <select name="" class="gf-select" style="flex:1;" required>
+                    <option value="">— Rol aprobador —</option>
+                    @foreach($roles as $rol)
+                        <option value="{{ $rol->id_rol }}">{{ $rol->name }}</option>
+                    @endforeach
+                </select>
+                <button type="button" class="gf-btn gf-btn-danger btn-quitar-paso"
+                        style="height:34px;padding:0 10px;font-size:12px;flex-shrink:0;">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+        </template>
+
         <div class="d-flex gap-2">
             <button type="submit" class="gf-btn gf-btn-primary">
                 <i class="bi bi-check-lg"></i> Guardar característica
@@ -153,5 +228,37 @@
 
     </form>
 </div>
+
+<script>
+(function () {
+    const container = document.getElementById('pasos-container');
+    const tpl       = document.getElementById('tpl-paso');
+
+    function reindexar() {
+        container.querySelectorAll('.paso-row').forEach((row, i) => {
+            row.querySelector('.paso-orden').textContent = i + 1;
+            row.querySelector('select').name = `flujo[pasos][${i}][rol_requerido]`;
+        });
+    }
+
+    document.getElementById('btn-agregar-paso').addEventListener('click', () => {
+        const clone = tpl.content.cloneNode(true);
+        container.appendChild(clone);
+        reindexar();
+    });
+
+    container.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-quitar-paso')) {
+            e.target.closest('.paso-row').remove();
+            reindexar();
+        }
+    });
+
+    // Si no hay pasos iniciales, agregar uno vacío automáticamente
+    if (container.querySelectorAll('.paso-row').length === 0) {
+        document.getElementById('btn-agregar-paso').click();
+    }
+})();
+</script>
 
 @endsection

@@ -10,9 +10,14 @@ class Flujo extends Model
     protected $primaryKey = 'id_flujo';
     public $timestamps = true;
 
-    protected $fillable = ['nombre', 'id_aspecto', 'activo'];
+    protected $fillable = ['nombre', 'id_caracteristica', 'id_aspecto', 'activo'];
 
     protected $casts = ['activo' => 'boolean'];
+
+    public function caracteristica()
+    {
+        return $this->belongsTo(Caracteristica::class, 'id_caracteristica', 'id_caracteristica');
+    }
 
     public function aspecto()
     {

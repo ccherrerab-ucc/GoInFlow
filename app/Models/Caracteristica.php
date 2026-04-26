@@ -59,4 +59,16 @@ class Caracteristica extends Model
     {
         return $this->hasMany(Aspecto::class, 'caracteristica_id', 'id_caracteristica');
     }
+
+    public function flujos(): HasMany
+    {
+        return $this->hasMany(Flujo::class, 'id_caracteristica', 'id_caracteristica');
+    }
+
+    public function flujoActivo(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Flujo::class, 'id_caracteristica', 'id_caracteristica')
+                    ->whereNull('id_aspecto')
+                    ->where('activo', true);
+    }
 }
