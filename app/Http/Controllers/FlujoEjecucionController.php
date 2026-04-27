@@ -12,9 +12,11 @@ class FlujoEjecucionController extends Controller
 {
     public function __construct(private readonly FlujoEjecucionService $service) {}
 
-    /** Envía la evidencia a revisión iniciando el flujo del aspecto. */
+    /** Envía la evidencia a revisión iniciando el flujo. Solo el creador o roles superiores. */
     public function iniciar(Evidencia $evidencia): RedirectResponse
     {
+        $this->authorize('iniciar', $evidencia);
+
         try {
             $this->service->iniciarFlujo($evidencia);
             return back()->with('success', 'Evidencia enviada a revisión correctamente.');
@@ -23,9 +25,11 @@ class FlujoEjecucionController extends Controller
         }
     }
 
-    /** Registra la decisión (aprobado / rechazado) del aprobador actual. */
+    /** Registra la decisión (aprobado / rechazado) — solo aprobadores autorizados. */
     public function decision(Request $request, Evidencia $evidencia): RedirectResponse
     {
+        $this->authorize('aprobar', $evidencia);
+
         $request->validate([
             'decision'   => ['required', 'in:aprobado,rechazado'],
             'comentario' => ['nullable', 'string', 'max:1000'],
@@ -51,9 +55,11 @@ class FlujoEjecucionController extends Controller
         }
     }
 
-    /** Reinicia el flujo desde el primer paso tras una corrección del Enlace. */
+    /** Reinicia el flujo tras corrección — solo el creador o roles superiores. */
     public function reiniciar(Evidencia $evidencia): RedirectResponse
     {
+        $this->authorize('iniciar', $evidencia);
+
         try {
             $this->service->reiniciarFlujo($evidencia->id_evidencia);
             return back()->with('success', 'Flujo reiniciado. La evidencia está en revisión nuevamente.');

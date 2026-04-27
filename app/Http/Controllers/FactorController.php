@@ -71,6 +71,9 @@ class FactorController extends Controller
 
     public function destroy(int $id): RedirectResponse
     {
+        $factor = $this->service->obtener($id);
+        $this->authorize('delete', $factor);
+
         $this->service->eliminar($id);
 
         return redirect()->route('factores.index')

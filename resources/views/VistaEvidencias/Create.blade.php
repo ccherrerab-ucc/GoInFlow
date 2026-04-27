@@ -70,6 +70,22 @@
             @enderror
         </div>
 
+        {{-- URL OneDrive / SharePoint --}}
+        <div class="mb-3">
+            <label class="gf-label" for="url_evidencia">
+                URL de evidencia en OneDrive / SharePoint
+            </label>
+            <input type="url"
+                   id="url_evidencia"
+                   name="url_evidencia"
+                   class="gf-input @error('url_evidencia') is-invalid @enderror"
+                   value="{{ old('url_evidencia') }}"
+                   placeholder="https://miempresa.sharepoint.com/sites/...">
+            @error('url_evidencia')
+                <div class="gf-field-error">{{ $message }}</div>
+            @enderror
+        </div>
+
         {{-- Fechas --}}
         <div class="row g-3 mb-3">
             <div class="col-md-6">

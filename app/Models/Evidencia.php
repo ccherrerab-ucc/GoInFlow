@@ -11,7 +11,7 @@ class Evidencia extends Model
     public $timestamps = true;
 
     protected $fillable = [
-        'nombre', 'descripcion', 'fecha_inicio', 'fecha_fin',
+        'nombre', 'descripcion', 'url_evidencia', 'fecha_inicio', 'fecha_fin',
         'estado_actual', 'id_aspecto',
         'created_by', 'updated_by', 'status_id',
     ];

@@ -7,11 +7,6 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
-/**
- * Principio: Responsabilidad Única — solo contiene lógica de negocio de Resultado.
- * Principio: Inversión de Dependencias — depende del repositorio vía inyección.
- * Principio: Abierto/Cerrado — se puede extender sin modificar el controlador.
- */
 class ResultadoService
 {
     public function __construct(private readonly ResultadoRepositoryInterface $repository) {}
@@ -28,16 +23,42 @@ class ResultadoService
 
     public function crear(array $datos): Model
     {
-        $datos['created_by'] = Auth::id();
-        $datos['updated_by'] = Auth::id();
-        $datos['status_id']  = 1; // Activo al crear
-        return $this->repository->create($datos);
+        $evidenciaIds = $datos['evidencias'] ?? [];
+        unset($datos['evidencias'], $datos['evidencias_enviadas']);
+
+        $datos['created_by']    = Auth::id();
+        $datos['updated_by']    = Auth::id();
+        $datos['status_id']     = 1;
+        $datos['tipo_relacion'] = 'aspecto';
+        $datos['id_referencia'] = 0;
+
+        $resultado = $this->repository->create($datos);
+
+        if (!empty($evidenciaIds)) {
+            $pivot = collect($evidenciaIds)
+                ->mapWithKeys(fn($id) => [$id => ['anexado_por' => Auth::id()]]);
+            $resultado->evidencias()->sync($pivot);
+        }
+
+        return $resultado;
     }
 
     public function actualizar(int $id, array $datos): Model
     {
+        $doSync       = isset($datos['evidencias_enviadas']);
+        $evidenciaIds = $datos['evidencias'] ?? [];
+        unset($datos['evidencias'], $datos['evidencias_enviadas']);
+
         $datos['updated_by'] = Auth::id();
-        return $this->repository->update($id, $datos);
+        $resultado = $this->repository->update($id, $datos);
+
+        if ($doSync) {
+            $pivot = collect($evidenciaIds)
+                ->mapWithKeys(fn($id) => [$id => ['anexado_por' => Auth::id()]]);
+            $resultado->evidencias()->sync($pivot);
+        }
+
+        return $resultado;
     }
 
     public function eliminar(int $id): bool

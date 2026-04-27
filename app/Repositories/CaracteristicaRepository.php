@@ -6,21 +6,26 @@ use App\Models\Caracteristica;
 use App\Repositories\Contracts\CaracteristicaRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
-/**
- * Repositorio Caracteristica.
- * Principio: Responsabilidad Única (S de SOLID).
- */
 class CaracteristicaRepository implements CaracteristicaRepositoryInterface
 {
     public function __construct(private readonly Caracteristica $model) {}
 
     public function all(): Collection
     {
-        return $this->model
+        $user  = Auth::user();
+        $query = $this->model
             ->with(['factor', 'status', 'responsableUser', 'aspectos'])
-            ->orderBy('id_caracteristica', 'desc')
-            ->get();
+            ->orderBy('id_caracteristica', 'desc');
+
+        // LiderCaracteristica ve solo sus características asignadas.
+        // Admin y Director ven todas.
+        if ($user?->isLiderCaracteristica()) {
+            $query->where('responsable', $user->id);
+        }
+
+        return $query->get();
     }
 
     public function findById(int $id): ?Model

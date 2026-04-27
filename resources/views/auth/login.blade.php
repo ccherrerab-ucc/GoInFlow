@@ -100,7 +100,7 @@
 
 
             <!-- LINKS: Olvidó contraseña + Registro -->
-            <div class="d-flex justify-content-between align-items-center mt-2">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mt-2 gap-2">
                 <div>
                     <!-- Botón que abre el modal -->
                     <a href="#" class="text-decoration-none small" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">

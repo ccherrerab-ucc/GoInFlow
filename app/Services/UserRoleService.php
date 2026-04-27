@@ -13,21 +13,17 @@ class UserRoleService implements UserRoleServiceInterface
     {
         if (!$user) return;
 
-        // 🚫 No tocar roles altos
-        if (in_array($user->id_rol, [1, 2])) {
+        // No tocar Admin (1), Director (2) ni LiderCaracteristica (3).
+        // Un Líder asignado manualmente por el Admin nunca debe ser
+        // degradado automáticamente al quitarle una asignación.
+        if (in_array($user->id_rol, [1, 2, 3])) {
             return;
         }
 
-        $tieneAsignaciones = $this->tieneAsignaciones($user);
-
-        // 🔼 PROMOVER
-        if ($tieneAsignaciones && $user->id_rol == 4) {
-            $user->update(['id_rol' => 3]); // Enlace → Líder
-        }
-
-        // 🔽 OPCIONAL (solo si quieres permitir regreso a Enlace)
-        if (!$tieneAsignaciones && $user->id_rol == 3) {
-            $user->update(['id_rol' => 4]); // Líder → Enlace
+        // Solo promover Enlace (4) → Líder (3) si tiene asignaciones.
+        // La vuelta a Enlace es siempre una decisión manual del Admin.
+        if ($user->id_rol == 4 && $this->tieneAsignaciones($user)) {
+            $user->update(['id_rol' => 3]);
         }
     }
 

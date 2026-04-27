@@ -31,6 +31,7 @@ use App\Models\Caracteristica;
 use App\Models\Aspecto;
 use App\Models\Evidencia;
 use App\Models\Resultado;
+use App\Models\User;
 
 // Policies
 use App\Policies\FactorPolicy;
@@ -38,6 +39,7 @@ use App\Policies\CaracteristicaPolicy;
 use App\Policies\AspectoPolicy;
 use App\Policies\EvidenciaPolicy;
 use App\Policies\ResultadoPolicy;
+use App\Policies\UserPolicy;
 
 // Observers
 use App\Observers\FactorObserver;
@@ -66,11 +68,12 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Policies — equivalente al $policies[] del AuthServiceProvider
-        Gate::policy(Factor::class, FactorPolicy::class);
+        Gate::policy(Factor::class,        FactorPolicy::class);
         Gate::policy(Caracteristica::class, CaracteristicaPolicy::class);
-        Gate::policy(Aspecto::class, AspectoPolicy::class);
-        Gate::policy(Evidencia::class, EvidenciaPolicy::class);
-        Gate::policy(Resultado::class, ResultadoPolicy::class);
+        Gate::policy(Aspecto::class,        AspectoPolicy::class);
+        Gate::policy(Evidencia::class,      EvidenciaPolicy::class);
+        Gate::policy(Resultado::class,      ResultadoPolicy::class);
+        Gate::policy(User::class,           UserPolicy::class);
 
         // Gates de dashboard (sin modelo asociado)
         Gate::define('dashboard.view', fn($user) => true);

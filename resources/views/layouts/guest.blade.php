@@ -25,6 +25,15 @@
             justify-content: center;
         }
 
+        /*.login-wrapper {
+            width: 100%;
+            max-width: 920px;
+            min-height: 540px;
+            display: flex;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(12, 68, 124, 0.12);
+        }*/
         .login-wrapper {
             width: 100%;
             max-width: 920px;
@@ -33,6 +42,62 @@
             border-radius: 16px;
             overflow: hidden;
             box-shadow: 0 4px 24px rgba(12, 68, 124, 0.12);
+        }
+
+        /* 📱 Responsive */
+        @media (max-width: 768px) {
+            .login-wrapper {
+                flex-direction: column;
+                max-width: 100%;
+                min-height: auto;
+                border-radius: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .panel-brand {
+                width: 100%;
+                padding: 25px 20px;
+                border-radius: 0;
+            }
+            .login-wrapper {
+                flex-direction: column;
+                max-width: 100%;
+                height: 100vh;
+                border-radius: 0;
+            }
+
+        }
+
+        @media (max-width: 768px) {
+            .panel-form {
+                width: 100%;
+                padding: 25px 20px;
+                border-radius: 0;
+            }
+
+            .login-wrapper {
+                flex-direction: column;
+                max-width: 100%;
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+
+       
+
+        
+
+        @media (max-width: 768px) {
+            .form-control-goinflow {
+                height: 45px;
+                font-size: 0.9rem;
+            }
+
+            .btn-goinflow {
+                padding: 12px;
+                font-size: 0.95rem;
+            }
         }
 
         /*.panel-brand {
@@ -83,8 +148,9 @@
             flex: 1;
             background: #ffffff;
             padding: 40px;
-            
+
         }
+
         .panel-form .logo-universidad {
             max-height: 120px;
             width: auto;

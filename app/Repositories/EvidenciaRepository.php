@@ -1,27 +1,40 @@
 <?php
- 
+
 namespace App\Repositories;
 
 use App\Models\Evidencia;
 use App\Repositories\Contracts\EvidenciaRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
-/**
- * Repositorio Evidencia.
- * Principio: Responsabilidad Única (S de SOLID).
- * Solo se encarga de la persistencia de Evidencia.
- */
 class EvidenciaRepository implements EvidenciaRepositoryInterface
 {
     public function __construct(private readonly Evidencia $model) {}
- 
+
     public function all(): Collection
     {
-        return $this->model
+        $user  = Auth::user();
+        $query = $this->model
             ->with(['status', 'aspecto.caracteristica', 'estadoActual'])
-            ->orderBy('id_evidencia', 'desc')
-            ->get();
+            ->orderBy('id_evidencia', 'desc');
+
+        if ($user?->isEnlace()) {
+            // Enlace ve evidencias que creó O que pertenecen a sus aspectos asignados.
+            $query->where(fn ($q) => $q
+                ->where('created_by', $user->id)
+                ->orWhereHas('aspecto', fn ($q2) => $q2->where('responsable', $user->id))
+            );
+        } elseif ($user?->isLiderCaracteristica()) {
+            // Líder ve evidencias de los aspectos de sus características.
+            $query->whereHas(
+                'aspecto.caracteristica',
+                fn ($q) => $q->where('responsable', $user->id)
+            );
+        }
+        // Admin y Director ven todas.
+
+        return $query->get();
     }
 
     public function findById(int $id): ?Model
@@ -30,19 +43,19 @@ class EvidenciaRepository implements EvidenciaRepositoryInterface
             ->with(['status', 'aspecto.caracteristica', 'estadoActual', 'createdBy', 'updatedBy'])
             ->findOrFail($id);
     }
- 
+
     public function create(array $data): Model
     {
         return $this->model->create($data);
     }
- 
+
     public function update(int $id, array $data): Model
     {
         $evidencia = $this->model->findOrFail($id);
         $evidencia->update($data);
         return $evidencia->fresh();
     }
- 
+
     public function delete(int $id): bool
     {
         $evidencia = $this->model->findOrFail($id);
@@ -52,9 +65,9 @@ class EvidenciaRepository implements EvidenciaRepositoryInterface
     public function allByAspecto(int $id): Collection
     {
         return $this->model
-            ->with(['status', 'responsable'])
+            ->with(['status', 'estadoActual'])
             ->where('id_aspecto', $id)
-            ->orderBy('id_aspecto', 'desc')
+            ->orderBy('id_evidencia', 'desc')
             ->get();
     }
 }

@@ -11,7 +11,7 @@
 </div>
 
 <div class="gf-page-title">Nuevo resultado</div>
-<div class="gf-page-sub">Registra un resultado asociado a un factor, característica o aspecto del CNA.</div>
+<div class="gf-page-sub">Registra un resultado y asocia las evidencias que lo respaldan.</div>
 
 <div class="gf-card" style="max-width:760px;">
 
@@ -46,87 +46,6 @@
             @error('description')
                 <div class="gf-field-error">{{ $message }}</div>
             @enderror
-        </div>
-
-        {{-- Tipo relación + Entidad --}}
-        <div class="row g-3 mb-3">
-            <div class="col-md-5">
-                <label class="gf-label" for="tipo_relacion">
-                    Tipo de relación <span style="color:var(--danger-text)">*</span>
-                </label>
-                <select id="tipo_relacion"
-                        name="tipo_relacion"
-                        class="gf-select @error('tipo_relacion') is-invalid @enderror"
-                        required>
-                    <option value="">— Seleccionar tipo —</option>
-                    @foreach($tiposRelacion as $tipo)
-                        <option value="{{ $tipo }}"
-                            {{ old('tipo_relacion') === $tipo ? 'selected' : '' }}>
-                            {{ ucfirst($tipo) }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('tipo_relacion')
-                    <div class="gf-field-error">{{ $message }}</div>
-                @enderror
-            </div>
-            <div class="col-md-7">
-                <label class="gf-label" for="id_referencia">
-                    Entidad relacionada <span style="color:var(--danger-text)">*</span>
-                </label>
-
-                {{-- Factor select --}}
-                <select id="ref_factor"
-                        name="id_referencia"
-                        class="gf-select ref-select @error('id_referencia') is-invalid @enderror"
-                        style="display:none;">
-                    <option value="">— Seleccionar factor —</option>
-                    @foreach($factores as $f)
-                        <option value="{{ $f->id_factor }}"
-                            {{ old('id_referencia') == $f->id_factor && old('tipo_relacion') === 'factor' ? 'selected' : '' }}>
-                            {{ $f->name }}
-                        </option>
-                    @endforeach
-                </select>
-
-                {{-- Característica select --}}
-                <select id="ref_caracteristica"
-                        name="id_referencia"
-                        class="gf-select ref-select @error('id_referencia') is-invalid @enderror"
-                        style="display:none;">
-                    <option value="">— Seleccionar característica —</option>
-                    @foreach($caracteristicas as $c)
-                        <option value="{{ $c->id_caracteristica }}"
-                            {{ old('id_referencia') == $c->id_caracteristica && old('tipo_relacion') === 'caracteristica' ? 'selected' : '' }}>
-                            {{ $c->name }}
-                        </option>
-                    @endforeach
-                </select>
-
-                {{-- Aspecto select --}}
-                <select id="ref_aspecto"
-                        name="id_referencia"
-                        class="gf-select ref-select @error('id_referencia') is-invalid @enderror"
-                        style="display:none;">
-                    <option value="">— Seleccionar aspecto —</option>
-                    @foreach($aspectos as $a)
-                        <option value="{{ $a->id_aspecto }}"
-                            {{ old('id_referencia') == $a->id_aspecto && old('tipo_relacion') === 'aspecto' ? 'selected' : '' }}>
-                            {{ $a->caracteristica?->name ? $a->caracteristica->name . ' › ' : '' }}{{ $a->name }}
-                        </option>
-                    @endforeach
-                </select>
-
-                {{-- Placeholder when no type selected --}}
-                <div id="ref_placeholder" class="gf-input"
-                     style="color:var(--gray-400);cursor:default;user-select:none;">
-                    Selecciona primero el tipo
-                </div>
-
-                @error('id_referencia')
-                    <div class="gf-field-error">{{ $message }}</div>
-                @enderror
-            </div>
         </div>
 
         {{-- Fechas --}}
@@ -183,6 +102,75 @@
             @enderror
         </div>
 
+        {{-- Evidencias asociadas --}}
+        <div class="mb-4">
+            <label class="gf-label">Evidencias asociadas</label>
+            <div style="border:1px solid var(--gray-200);border-radius:8px;
+                        max-height:380px;overflow-y:auto;">
+                @php $seleccionadas = old('evidencias', []); @endphp
+                @forelse($factores as $factor)
+                    @php $carConEv = $factor->caracteristicas->filter(fn($c) => $c->aspectos->some(fn($a) => $a->evidencias->isNotEmpty())); @endphp
+                    @if($carConEv->isNotEmpty())
+                    {{-- Factor --}}
+                    <div style="padding:7px 12px 5px;font-weight:600;font-size:13px;
+                                color:var(--primary);background:var(--gray-50);
+                                border-bottom:1px solid var(--gray-100);position:sticky;top:0;z-index:1;">
+                        <i class="bi bi-stack me-1" style="font-size:11px;"></i>{{ $factor->name }}
+                    </div>
+                    @foreach($carConEv as $car)
+                        @php $aspConEv = $car->aspectos->filter(fn($a) => $a->evidencias->isNotEmpty()); @endphp
+                        {{-- Característica --}}
+                        <div style="padding:5px 20px 2px;font-size:12px;font-weight:600;
+                                    color:var(--gray-600);background:var(--gray-50);
+                                    border-bottom:1px solid var(--gray-100);">
+                            {{ $car->name }}
+                        </div>
+                        @foreach($aspConEv as $asp)
+                        {{-- Aspecto --}}
+                        <div style="padding:4px 28px 2px;font-size:11px;font-weight:500;
+                                    color:var(--gray-400);border-bottom:1px solid var(--gray-50);">
+                            <i class="bi bi-bookmark me-1"></i>{{ $asp->name }}
+                        </div>
+                        @foreach($asp->evidencias as $ev)
+                        @php
+                            $stClase = [1=>'borrador',2=>'revision',3=>'aprobado',4=>'rechazado'][$ev->estado_actual] ?? 'borrador';
+                            $stLabel = [1=>'Borrador',2=>'En revisión',3=>'Aprobado',4=>'Rechazado'][$ev->estado_actual] ?? '';
+                        @endphp
+                        <label for="ev_{{ $ev->id_evidencia }}"
+                               style="display:flex;align-items:center;gap:8px;
+                                      padding:6px 36px;cursor:pointer;
+                                      border-bottom:1px solid var(--gray-50);
+                                      font-size:12px;font-weight:normal;
+                                      transition:background .12s;"
+                               onmouseover="this.style.background='var(--gray-50)'"
+                               onmouseout="this.style.background=''">
+                            <input type="checkbox"
+                                   id="ev_{{ $ev->id_evidencia }}"
+                                   name="evidencias[]"
+                                   value="{{ $ev->id_evidencia }}"
+                                   {{ in_array($ev->id_evidencia, $seleccionadas) ? 'checked' : '' }}>
+                            <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"
+                                  title="{{ $ev->nombre }}">{{ $ev->nombre }}</span>
+                            <span class="gf-status gf-status-{{ $stClase }}"
+                                  style="font-size:10px;padding:1px 6px;flex-shrink:0;">
+                                {{ $stLabel }}
+                            </span>
+                        </label>
+                        @endforeach
+                        @endforeach
+                    @endforeach
+                    @endif
+                @empty
+                    <div style="padding:24px;text-align:center;color:var(--gray-400);font-size:13px;">
+                        No hay evidencias registradas.
+                    </div>
+                @endforelse
+            </div>
+            @error('evidencias')
+                <div class="gf-field-error">{{ $message }}</div>
+            @enderror
+        </div>
+
         <div class="d-flex gap-2">
             <button type="submit" class="gf-btn gf-btn-primary">
                 <i class="bi bi-check-lg"></i> Guardar resultado
@@ -194,35 +182,5 @@
 
     </form>
 </div>
-
-<script>
-(function () {
-    const tipoSelect = document.getElementById('tipo_relacion');
-    const refMap = {
-        factor:         document.getElementById('ref_factor'),
-        caracteristica: document.getElementById('ref_caracteristica'),
-        aspecto:        document.getElementById('ref_aspecto'),
-    };
-    const placeholder = document.getElementById('ref_placeholder');
-
-    function showRef(tipo) {
-        placeholder.style.display = 'none';
-        Object.entries(refMap).forEach(([key, el]) => {
-            const show = key === tipo;
-            el.style.display = show ? '' : 'none';
-            el.disabled = !show;
-            el.required = show;
-        });
-        if (!tipo) {
-            placeholder.style.display = '';
-        }
-    }
-
-    tipoSelect.addEventListener('change', () => showRef(tipoSelect.value));
-
-    // Init on page load (handles old() repopulation after validation failure)
-    showRef(tipoSelect.value);
-})();
-</script>
 
 @endsection

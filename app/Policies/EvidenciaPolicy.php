@@ -40,9 +40,23 @@ class EvidenciaPolicy
 
     public function update(User $user, Evidencia $evidencia): bool
     {
-        // Enlace solo puede editar las evidencias que él mismo creó
+        // Enlace solo puede editar las evidencias que él mismo creó.
+        // Usar == (no ===) porque SQL Server puede devolver created_by como string.
         if ($user->isEnlace()) {
-            return $evidencia->created_by === $user->id;
+            return $evidencia->created_by == $user->id;
+        }
+
+        return $user->isDirector() || $user->isLiderCaracteristica();
+    }
+
+    /**
+     * Enviar al flujo de aprobación o reenviar tras rechazo.
+     * Mismas reglas que update: el creador o roles superiores.
+     */
+    public function iniciar(User $user, Evidencia $evidencia): bool
+    {
+        if ($user->isEnlace()) {
+            return $evidencia->created_by == $user->id;
         }
 
         return $user->isDirector() || $user->isLiderCaracteristica();

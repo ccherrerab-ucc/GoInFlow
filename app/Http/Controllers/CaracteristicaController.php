@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CaracteristicaRequest;
+use App\Models\Caracteristica;
 use App\Models\Factor;
 use App\Models\StatusCna;
 use App\Models\User;
@@ -16,6 +17,8 @@ class CaracteristicaController extends Controller
 
     public function index(): View
     {
+        $this->authorize('viewAny', Caracteristica::class);
+
         return view('VistaCaracteristicas.index', [
             'caracteristicas' => $this->service->listar(),
         ]);
@@ -23,18 +26,23 @@ class CaracteristicaController extends Controller
 
     public function show(int $id): View
     {
-        return view('VistaCaracteristicas.Show', [
-            'caracteristica' => $this->service->obtenerParaEvaluacion($id),
-        ]);
+        $caracteristica = $this->service->obtenerParaEvaluacion($id);
+        $this->authorize('view', $caracteristica);
+
+        return view('VistaCaracteristicas.Show', compact('caracteristica'));
     }
 
     public function create(): View
     {
+        $this->authorize('create', Caracteristica::class);
+
         return view('VistaCaracteristicas.create', $this->formData());
     }
 
     public function store(CaracteristicaRequest $request): RedirectResponse
     {
+        $this->authorize('create', Caracteristica::class);
+
         $this->service->crear($request->validated());
 
         return redirect()->route('caracteristicas.index')
@@ -43,14 +51,20 @@ class CaracteristicaController extends Controller
 
     public function edit(int $id): View
     {
+        $caracteristica = $this->service->obtener($id);
+        $this->authorize('update', $caracteristica);
+
         return view('VistaCaracteristicas.edit', array_merge(
             $this->formData(),
-            ['caracteristica' => $this->service->obtener($id)]
+            ['caracteristica' => $caracteristica]
         ));
     }
 
     public function update(CaracteristicaRequest $request, int $id): RedirectResponse
     {
+        $caracteristica = $this->service->obtener($id);
+        $this->authorize('update', $caracteristica);
+
         $this->service->actualizar($id, $request->validated());
 
         return redirect()->route('caracteristicas.index')
@@ -59,6 +73,9 @@ class CaracteristicaController extends Controller
 
     public function destroy(int $id): RedirectResponse
     {
+        $caracteristica = $this->service->obtener($id);
+        $this->authorize('delete', $caracteristica);
+
         $this->service->eliminar($id);
 
         return redirect()->route('caracteristicas.index')

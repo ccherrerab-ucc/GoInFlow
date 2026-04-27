@@ -9,9 +9,11 @@
         <div class="gf-page-title">Aspectos por evaluar</div>
         <div class="gf-page-sub">Unidades mínimas de evaluación del CNA</div>
     </div>
-    <a href="{{ route('aspectos.create') }}" class="gf-btn gf-btn-primary">
-        <i class="bi bi-plus-lg"></i> Nuevo aspecto
-    </a>
+    @can('create', App\Models\Aspecto::class)
+        <a href="{{ route('aspectos.create') }}" class="gf-btn gf-btn-primary">
+            <i class="bi bi-plus-lg"></i> Nuevo aspecto
+        </a>
+    @endcan
 </div>
 
 <div class="gf-card p-0" style="overflow:hidden;">
@@ -53,25 +55,32 @@
                         </span>
                     </td>
                     <td>
-                        <div class="d-flex gap-2">
-                            <a href="{{ route('aspectos.edit', $a->id_aspecto) }}"
-                               class="gf-btn gf-btn-outline"
-                               style="height:30px;padding:0 10px;font-size:12px;"
-                               title="Editar">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <form action="{{ route('aspectos.destroy', $a->id_aspecto) }}"
-                                  method="POST"
-                                  onsubmit="return confirm('¿Eliminar este aspecto?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit"
-                                        class="gf-btn gf-btn-danger"
-                                        style="height:30px;padding:0 10px;font-size:12px;"
-                                        title="Eliminar">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </form>
+                        <div class="d-flex gap-1">
+                            {{-- Editar — Admin, Director y Líder --}}
+                            @can('update', $a)
+                                <a href="{{ route('aspectos.edit', $a->id_aspecto) }}"
+                                   class="gf-btn gf-btn-outline"
+                                   style="height:30px;padding:0 10px;font-size:12px;"
+                                   title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            @endcan
+
+                            {{-- Eliminar — solo Admin --}}
+                            @can('delete', $a)
+                                <form action="{{ route('aspectos.destroy', $a->id_aspecto) }}"
+                                      method="POST"
+                                      onsubmit="return confirm('¿Eliminar este aspecto?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                            class="gf-btn gf-btn-danger"
+                                            style="height:30px;padding:0 10px;font-size:12px;"
+                                            title="Eliminar">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            @endcan
                         </div>
                     </td>
                 </tr>
@@ -80,10 +89,12 @@
                     <td colspan="9" style="text-align:center;padding:40px;color:var(--gray-400);">
                         <i class="bi bi-inbox" style="font-size:28px;display:block;margin-bottom:10px;"></i>
                         No hay aspectos registrados.
-                        <a href="{{ route('aspectos.create') }}"
-                           style="color:var(--primary-mid);display:block;margin-top:6px;">
-                            Crear el primer aspecto
-                        </a>
+                        @can('create', App\Models\Aspecto::class)
+                            <a href="{{ route('aspectos.create') }}"
+                               style="color:var(--primary-mid);display:block;margin-top:6px;">
+                                Crear el primer aspecto
+                            </a>
+                        @endcan
                     </td>
                 </tr>
             @endforelse

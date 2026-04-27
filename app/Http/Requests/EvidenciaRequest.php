@@ -18,9 +18,10 @@ class EvidenciaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nombre'       => ['required', 'string', 'max:255'],
-            'descripcion'  => ['nullable', 'string', 'max:1000'],
-            'id_aspecto'   => ['required', 'exists:aspectos,id_aspecto'],
+            'nombre'        => ['required', 'string', 'max:255'],
+            'descripcion'   => ['nullable', 'string', 'max:1000'],
+            'url_evidencia' => ['nullable', 'url', 'max:2048'],
+            'id_aspecto'    => ['required', 'exists:aspectos,id_aspecto'],
             'fecha_inicio' => ['required', 'date'],
             'fecha_fin'    => ['required', 'date', 'after_or_equal:fecha_inicio'],
             'estado_actual'=> ['nullable', 'exists:estado_documento,id_estado'],

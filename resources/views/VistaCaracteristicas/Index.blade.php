@@ -9,9 +9,11 @@
         <div class="gf-page-title">Características</div>
         <div class="gf-page-sub">Agrupación de aspectos por temática evaluada</div>
     </div>
-    <a href="{{ route('caracteristicas.create') }}" class="gf-btn gf-btn-primary">
-        <i class="bi bi-plus-lg"></i> Nueva característica
-    </a>
+    @can('create', App\Models\Caracteristica::class)
+        <a href="{{ route('caracteristicas.create') }}" class="gf-btn gf-btn-primary">
+            <i class="bi bi-plus-lg"></i> Nueva característica
+        </a>
+    @endcan
 </div>
 
 <div class="gf-card p-0" style="overflow:hidden;">
@@ -57,31 +59,40 @@
                         </span>
                     </td>
                     <td>
-                        <div class="d-flex gap-2">
+                        <div class="d-flex gap-1">
+                            {{-- Ver evaluación — todos los roles --}}
                             <a href="{{ route('caracteristicas.show', $c->id_caracteristica) }}"
                                class="gf-btn gf-btn-primary"
                                style="height:30px;padding:0 10px;font-size:12px;"
                                title="Ver evaluación">
                                 <i class="bi bi-eye"></i>
                             </a>
-                            <a href="{{ route('caracteristicas.edit', $c->id_caracteristica) }}"
-                               class="gf-btn gf-btn-outline"
-                               style="height:30px;padding:0 10px;font-size:12px;"
-                               title="Editar">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <form action="{{ route('caracteristicas.destroy', $c->id_caracteristica) }}"
-                                  method="POST"
-                                  onsubmit="return confirm('¿Eliminar esta característica? Se eliminarán también sus aspectos asociados.')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit"
-                                        class="gf-btn gf-btn-danger"
-                                        style="height:30px;padding:0 10px;font-size:12px;"
-                                        title="Eliminar">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </form>
+
+                            {{-- Editar — Admin y Director --}}
+                            @can('update', $c)
+                                <a href="{{ route('caracteristicas.edit', $c->id_caracteristica) }}"
+                                   class="gf-btn gf-btn-outline"
+                                   style="height:30px;padding:0 10px;font-size:12px;"
+                                   title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            @endcan
+
+                            {{-- Eliminar — solo Admin --}}
+                            @can('delete', $c)
+                                <form action="{{ route('caracteristicas.destroy', $c->id_caracteristica) }}"
+                                      method="POST"
+                                      onsubmit="return confirm('¿Eliminar esta característica? Se eliminarán también sus aspectos asociados.')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                            class="gf-btn gf-btn-danger"
+                                            style="height:30px;padding:0 10px;font-size:12px;"
+                                            title="Eliminar">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            @endcan
                         </div>
                     </td>
                 </tr>
@@ -90,10 +101,12 @@
                     <td colspan="9" style="text-align:center;padding:40px;color:var(--gray-400);">
                         <i class="bi bi-inbox" style="font-size:28px;display:block;margin-bottom:10px;"></i>
                         No hay características registradas.
-                        <a href="{{ route('caracteristicas.create') }}"
-                           style="color:var(--primary-mid);display:block;margin-top:6px;">
-                            Crear la primera característica
-                        </a>
+                        @can('create', App\Models\Caracteristica::class)
+                            <a href="{{ route('caracteristicas.create') }}"
+                               style="color:var(--primary-mid);display:block;margin-top:6px;">
+                                Crear la primera característica
+                            </a>
+                        @endcan
                     </td>
                 </tr>
             @endforelse

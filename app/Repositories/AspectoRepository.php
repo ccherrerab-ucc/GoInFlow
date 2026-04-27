@@ -6,21 +6,29 @@ use App\Models\Aspecto;
 use App\Repositories\Contracts\AspectoRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
-/**
- * Repositorio Aspecto.
- * Principio: Responsabilidad Única (S de SOLID).
- */
 class AspectoRepository implements AspectoRepositoryInterface
 {
     public function __construct(private readonly Aspecto $model) {}
 
     public function all(): Collection
     {
-        return $this->model
+        $user  = Auth::user();
+        $query = $this->model
             ->with(['caracteristica.factor', 'status', 'responsableUser'])
-            ->orderBy('id_aspecto', 'desc')
-            ->get();
+            ->orderBy('id_aspecto', 'desc');
+
+        if ($user?->isEnlace()) {
+            // Enlace ve solo los aspectos donde es responsable.
+            $query->where('responsable', $user->id);
+        } elseif ($user?->isLiderCaracteristica()) {
+            // Líder ve los aspectos de sus características asignadas.
+            $query->whereHas('caracteristica', fn ($q) => $q->where('responsable', $user->id));
+        }
+        // Admin y Director ven todos.
+
+        return $query->get();
     }
 
     public function findById(int $id): ?Model
@@ -61,9 +69,7 @@ class AspectoRepository implements AspectoRepositoryInterface
     {
         return $this->model
             ->with(['caracteristica.factor', 'status', 'responsableUser'])
-            ->whereHas('caracteristica', function ($query) use ($id) {
-                $query->where('factor_id', $id);
-            })
+            ->whereHas('caracteristica', fn ($q) => $q->where('factor_id', $id))
             ->orderBy('id_aspecto', 'desc')
             ->get();
     }
