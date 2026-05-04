@@ -6,23 +6,35 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
-use App\Models\User;
-
 
 class AuthenticatedSessionController extends Controller
 {
     /**
-     * Display the login view.
+     * Muestra el formulario de login.
+     * Si el usuario ya está autenticado lo redirige directamente.
+     * Headers no-cache para que el navegador nunca sirva esta página
+     * desde caché (evita el 419 al presionar "atrás").
      */
-    public function create(): View
+    public function create(): View|RedirectResponse
     {
-        return view('auth.login');
+        if (Auth::check()) {
+            return $this->redirectSegunRol(Auth::user());
+        }
+
+        return response()
+            ->view('auth.login')
+            ->withHeaders([
+                'Cache-Control' => 'no-cache, no-store, must-revalidate, max-age=0',
+                'Pragma'        => 'no-cache',
+                'Expires'       => '0',
+            ]);
     }
 
     /**
-     * Handle an incoming authentication request.
+     * Procesa el intento de autenticación.
      */
     public function store(LoginRequest $request): RedirectResponse
     {
@@ -31,63 +43,54 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         $user = Auth::user();
-        assert($user instanceof User);
-        
-        if (!$user) {
-            return redirect()->route('login')
-                ->withErrors(['email' => 'No se pudo obtener el usuario autenticado.'+ $user->id]);
-        }
 
-        // Cargar la relación rol de una sola vez para evitar N+1
-        $nuevavariable =$user->load('rol');
+        // Cargar el rol antes de cualquier verificación (evita N+1)
+        $user->load('rol');
 
-        // Verificar que el usuario esté activo (id_status)
-        // Ajusta el valor según cómo tengas definido "activo" en tu tabla Status
+        // Verificar que la cuenta esté activa
         if ($user->id_status != 1) {
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
             return redirect()->route('login')
-                ->withErrors(['email' => 'Tu cuenta está inactiva. Contacta al administrador.'+ $nuevavariable ]);
+                ->withErrors(['email' => 'Tu cuenta está inactiva. Contacta al administrador.']);
         }
 
-        // Redirigir según rol
-        if ($user->isAdmin()) {
-            return redirect()->intended(route('administrator.dashboard')); //('admin.dashboard'));
-        }
-
-        if ($user->isDirector()) {
-            return redirect()->intended(route('dashboard')); //('director.dashboard'));
-        }
-
-        if ($user->isLiderCaracteristica()) {
-            return redirect()->intended(route('dashboard')); //('lider.dashboard'));
-        }
-
-        if ($user->isEnlace()) {
-            return redirect()->intended(route('dashboard')); //('enlace.dashboard'));
-        }
-
-        // Si el usuario existe pero no tiene rol válido reconocido
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect()->route('login')
-            ->withErrors(['email' => 'Tu usuario no tiene un rol asignado. Contacta al administrador.' . $nuevavariable ]);
+        return $this->redirectSegunRol($user);
     }
+
     /**
-     * Destroy an authenticated session.
+     * Cierra la sesión.
      */
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect()->route('login');
+    }
+
+    /* ── Helpers ─────────────────────────────────────────── */
+
+    private function redirectSegunRol($user): RedirectResponse
+    {
+        if ($user->isAdmin()) {
+            return redirect()->intended(route('administrator.dashboard'));
+        }
+
+        if ($user->isDirector() || $user->isLiderCaracteristica() || $user->isEnlace()) {
+            return redirect()->intended(route('dashboard'));
+        }
+
+        // Rol no reconocido — cerrar sesión y mostrar error
+        Auth::logout();
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
+
+        return redirect()->route('login')
+            ->withErrors(['email' => 'Tu usuario no tiene un rol asignado. Contacta al administrador.']);
     }
 }
