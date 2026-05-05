@@ -8,17 +8,14 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
 {
     /**
      * Muestra el formulario de login.
-     * Si el usuario ya está autenticado lo redirige directamente.
-     * Headers no-cache para que el navegador nunca sirva esta página
-     * desde caché (evita el 419 al presionar "atrás").
+     * No-cache headers evitan el 419 al presionar "atrás" con sesión renovada.
      */
-    public function create(): View|RedirectResponse
+    public function create(): Response|RedirectResponse
     {
         if (Auth::check()) {
             return $this->redirectSegunRol(Auth::user());
@@ -42,10 +39,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        /** @var \App\Models\User $user */
         $user = Auth::user();
-
-        // Cargar el rol antes de cualquier verificación (evita N+1)
-        $user->load('rol');
 
         // Verificar que la cuenta esté activa
         if ($user->id_status != 1) {
@@ -81,7 +76,7 @@ class AuthenticatedSessionController extends Controller
             return redirect()->intended(route('administrator.dashboard'));
         }
 
-        if ($user->isDirector() || $user->isLiderCaracteristica() || $user->isEnlace()) {
+        if ($user->isDirPrograma() || $user->isDirector() || $user->isLiderCaracteristica() || $user->isEnlace()) {
             return redirect()->intended(route('dashboard'));
         }
 

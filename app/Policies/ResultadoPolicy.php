@@ -6,8 +6,8 @@ use App\Models\Resultado;
 use App\Models\User;
 
 /**
- * Policy para Resultado.
- * Roles: Administrador → todo | Director → ver/crear/editar | Líder/Enlace → solo ver
+ * ADMIN: full | DIR_PROGRAMA: read | DIRECTOR: read (factor asignado) |
+ * LIDER: registrar (crear + editar) | ENLACE: cargar
  */
 class ResultadoPolicy
 {
@@ -19,7 +19,7 @@ class ResultadoPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return true; // visibilidad acotada en el repositorio por rol
     }
 
     public function view(User $user, Resultado $resultado): bool
@@ -29,12 +29,12 @@ class ResultadoPolicy
 
     public function create(User $user): bool
     {
-        return $user->isDirector();
+        return $user->isLiderCaracteristica() || $user->isEnlace();
     }
 
     public function update(User $user, Resultado $resultado): bool
     {
-        return $user->isDirector();
+        return $user->isLiderCaracteristica() || $user->isEnlace();
     }
 
     public function delete(User $user, Resultado $resultado): bool

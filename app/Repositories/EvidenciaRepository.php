@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Evidencia;
+use App\Models\User;
 use App\Repositories\Contracts\EvidenciaRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -14,25 +15,32 @@ class EvidenciaRepository implements EvidenciaRepositoryInterface
 
     public function all(): Collection
     {
-        $user  = Auth::user();
+        $raw  = Auth::user();
+        $user = $raw instanceof User ? $raw : null;
         $query = $this->model
             ->with(['status', 'aspecto.caracteristica', 'estadoActual'])
             ->orderBy('id_evidencia', 'desc');
 
-        if ($user?->isEnlace()) {
-            // Enlace ve evidencias que creó O que pertenecen a sus aspectos asignados.
-            $query->where(fn ($q) => $q
-                ->where('created_by', $user->id)
-                ->orWhereHas('aspecto', fn ($q2) => $q2->where('responsable', $user->id))
+        if ($user?->isDirector()) {
+            // Director ve evidencias de sus factores asignados
+            $query->whereHas(
+                'aspecto.caracteristica.factor',
+                fn($q) => $q->where('responsable', $user->id)
             );
         } elseif ($user?->isLiderCaracteristica()) {
-            // Líder ve evidencias de los aspectos de sus características.
+            // Líder ve evidencias de los aspectos de sus características
             $query->whereHas(
                 'aspecto.caracteristica',
-                fn ($q) => $q->where('responsable', $user->id)
+                fn($q) => $q->where('responsable', $user->id)
+            );
+        } elseif ($user?->isEnlace()) {
+            // Enlace ve evidencias que creó O que pertenecen a sus aspectos asignados
+            $query->where(fn($q) => $q
+                ->where('created_by', $user->id)
+                ->orWhereHas('aspecto', fn($q2) => $q2->where('responsable', $user->id))
             );
         }
-        // Admin y Director ven todas.
+        // Admin y DirPrograma ven todas
 
         return $query->get();
     }

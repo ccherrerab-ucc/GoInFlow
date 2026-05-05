@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Caracteristica;
+use App\Models\User;
 use App\Repositories\Contracts\CaracteristicaRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -14,16 +15,20 @@ class CaracteristicaRepository implements CaracteristicaRepositoryInterface
 
     public function all(): Collection
     {
-        $user  = Auth::user();
+        $raw  = Auth::user();
+        $user = $raw instanceof User ? $raw : null;
         $query = $this->model
             ->with(['factor', 'status', 'responsableUser', 'aspectos'])
             ->orderBy('id_caracteristica', 'desc');
 
-        // LiderCaracteristica ve solo sus características asignadas.
-        // Admin y Director ven todas.
-        if ($user?->isLiderCaracteristica()) {
+        if ($user?->isDirector()) {
+            // Director ve solo características de sus factores asignados
+            $query->whereHas('factor', fn($q) => $q->where('responsable', $user->id));
+        } elseif ($user?->isLiderCaracteristica()) {
+            // Líder ve solo las características donde es responsable
             $query->where('responsable', $user->id);
         }
+        // Admin y DirPrograma ven todas; Enlace no accede (policy devuelve false en viewAny)
 
         return $query->get();
     }
@@ -77,11 +82,11 @@ class CaracteristicaRepository implements CaracteristicaRepositoryInterface
                 'aspectos.evidencias.status',
                 'aspectos.evidencias.createdBy',
                 'aspectos.evidencias.resultados',
-                'aspectos.evidencias.flujoEjecuciones' => fn ($q) => $q
+                'aspectos.evidencias.flujoEjecuciones' => fn($q) => $q
                     ->orderByDesc('id_ejecucion')
                     ->with([
                         'pasoActual.rolRequerido',
-                        'historial' => fn ($h) => $h
+                        'historial' => fn($h) => $h
                             ->orderBy('fecha')
                             ->with(['usuario', 'paso.rolRequerido']),
                     ]),

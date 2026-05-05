@@ -75,9 +75,11 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Resultado::class,      ResultadoPolicy::class);
         Gate::policy(User::class,           UserPolicy::class);
 
-        // Gates de dashboard (sin modelo asociado)
-        Gate::define('dashboard.view', fn($user) => true);
-        Gate::define('dashboard.view-global', fn($user) => $user->isAdmin() || $user->isDirector());
+        // Gates de dashboard
+        Gate::define('dashboard.view', fn() => true);
+        Gate::define('dashboard.view-global', fn($user) =>
+            $user->isAdmin() || $user->isDirPrograma() || $user->isDirector()
+        );
 
         // Observers de auditoría — se disparan automáticamente en created/updated/deleted
         Factor::observe(FactorObserver::class);

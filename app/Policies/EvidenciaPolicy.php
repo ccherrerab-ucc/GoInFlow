@@ -6,11 +6,8 @@ use App\Models\Evidencia;
 use App\Models\User;
 
 /**
- * Roles:
- *   Admin      → todo
- *   Director   → ver + aprobar + rechazar (no cargar)
- *   Líder      → ver + aprobar + rechazar (de sus características)
- *   Enlace     → ver + crear + editar (solo las propias)
+ * ADMIN: full | DIR_PROGRAMA: read | DIRECTOR: read (factor asignado) |
+ * LIDER: aprobar + registrar (de sus características) | ENLACE: cargar (aspecto asignado)
  */
 class EvidenciaPolicy
 {
@@ -22,7 +19,7 @@ class EvidenciaPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return true; // visibilidad acotada en el repositorio por rol
     }
 
     public function view(User $user, Evidencia $evidencia): bool
@@ -32,50 +29,38 @@ class EvidenciaPolicy
 
     public function create(User $user): bool
     {
-        // Director y Líder también pueden crear en este proyecto
-        return $user->isDirector()
-            || $user->isLiderCaracteristica()
-            || $user->isEnlace();
+        return $user->isLiderCaracteristica() || $user->isEnlace();
     }
 
     public function update(User $user, Evidencia $evidencia): bool
     {
-        // Enlace solo puede editar las evidencias que él mismo creó.
-        // Usar == (no ===) porque SQL Server puede devolver created_by como string.
-        if ($user->isEnlace()) {
-            return $evidencia->created_by == $user->id;
-        }
-
-        return $user->isDirector() || $user->isLiderCaracteristica();
-    }
-
-    /**
-     * Enviar al flujo de aprobación o reenviar tras rechazo.
-     * Mismas reglas que update: el creador o roles superiores.
-     */
-    public function iniciar(User $user, Evidencia $evidencia): bool
-    {
-        if ($user->isEnlace()) {
-            return $evidencia->created_by == $user->id;
-        }
-
-        return $user->isDirector() || $user->isLiderCaracteristica();
+        if ($user->isLiderCaracteristica()) return true; // cualquiera de sus características
+        if ($user->isEnlace()) return $evidencia->created_by == $user->id;
+        return false;
     }
 
     public function delete(User $user, Evidencia $evidencia): bool
     {
-        return false; // solo Admin
+        return false; // solo Admin (resuelto en before())
     }
 
-    /** Acción personalizada: aprobar o rechazar en el flujo */
+    /** Enviar al flujo de aprobación (iniciar / reiniciar) */
+    public function iniciar(User $user, Evidencia $evidencia): bool
+    {
+        if ($user->isLiderCaracteristica()) return true;
+        if ($user->isEnlace()) return $evidencia->created_by == $user->id;
+        return false;
+    }
+
+    /** Aprobar o rechazar en el flujo */
     public function aprobar(User $user, Evidencia $evidencia): bool
     {
-        return $user->isDirector() || $user->isLiderCaracteristica();
+        return $user->isLiderCaracteristica();
     }
 
-    /** Acción personalizada: descargar archivo */
+    /** Descargar archivo adjunto */
     public function descargar(User $user, Evidencia $evidencia): bool
     {
-        return true; // cualquier rol autenticado puede descargar
+        return true;
     }
 }

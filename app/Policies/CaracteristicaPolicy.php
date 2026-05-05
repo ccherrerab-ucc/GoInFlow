@@ -6,11 +6,8 @@ use App\Models\Caracteristica;
 use App\Models\User;
 
 /**
- * Roles:
- *   Admin      → todo
- *   Director   → ver + crear + editar (no eliminar)
- *   Líder      → solo ver
- *   Enlace     → solo ver
+ * ADMIN: full | DIR_PROGRAMA: full | DIRECTOR: read (factor asignado) |
+ * LIDER: ver + editar (propias) | ENLACE: ninguno
  */
 class CaracteristicaPolicy
 {
@@ -22,26 +19,39 @@ class CaracteristicaPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->isDirPrograma()
+            || $user->isDirector()
+            || $user->isLiderCaracteristica();
     }
 
     public function view(User $user, Caracteristica $caracteristica): bool
     {
-        return true;
+        if ($user->isDirPrograma()) return true;
+        if ($user->isDirector()) {
+            return $caracteristica->factor?->responsable == $user->id;
+        }
+        if ($user->isLiderCaracteristica()) {
+            return $caracteristica->responsable == $user->id;
+        }
+        return false;
     }
 
     public function create(User $user): bool
     {
-        return $user->isDirector();
+        return $user->isDirPrograma();
     }
 
     public function update(User $user, Caracteristica $caracteristica): bool
     {
-        return $user->isDirector();
+        if ($user->isDirPrograma()) return true;
+        if ($user->isLiderCaracteristica()) {
+            return $caracteristica->responsable == $user->id;
+        }
+        return false;
     }
 
     public function delete(User $user, Caracteristica $caracteristica): bool
     {
-        return false; // solo Admin
+        return $user->isDirPrograma();
     }
 }

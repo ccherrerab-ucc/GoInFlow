@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Aspecto;
+use App\Models\User;
 use App\Repositories\Contracts\AspectoRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -14,19 +15,23 @@ class AspectoRepository implements AspectoRepositoryInterface
 
     public function all(): Collection
     {
-        $user  = Auth::user();
+        $raw  = Auth::user();
+        $user = $raw instanceof User ? $raw : null;
         $query = $this->model
             ->with(['caracteristica.factor', 'status', 'responsableUser'])
             ->orderBy('id_aspecto', 'desc');
 
-        if ($user?->isEnlace()) {
-            // Enlace ve solo los aspectos donde es responsable.
-            $query->where('responsable', $user->id);
+        if ($user?->isDirector()) {
+            // Director ve solo aspectos de sus factores asignados
+            $query->whereHas('caracteristica.factor', fn($q) => $q->where('responsable', $user->id));
         } elseif ($user?->isLiderCaracteristica()) {
-            // Líder ve los aspectos de sus características asignadas.
-            $query->whereHas('caracteristica', fn ($q) => $q->where('responsable', $user->id));
+            // Líder ve aspectos de sus características asignadas
+            $query->whereHas('caracteristica', fn($q) => $q->where('responsable', $user->id));
+        } elseif ($user?->isEnlace()) {
+            // Enlace ve solo los aspectos donde es responsable
+            $query->where('responsable', $user->id);
         }
-        // Admin y Director ven todos.
+        // Admin y DirPrograma ven todos
 
         return $query->get();
     }
@@ -69,7 +74,7 @@ class AspectoRepository implements AspectoRepositoryInterface
     {
         return $this->model
             ->with(['caracteristica.factor', 'status', 'responsableUser'])
-            ->whereHas('caracteristica', fn ($q) => $q->where('factor_id', $id))
+            ->whereHas('caracteristica', fn($q) => $q->where('factor_id', $id))
             ->orderBy('id_aspecto', 'desc')
             ->get();
     }

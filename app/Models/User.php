@@ -91,6 +91,11 @@ class User extends Authenticatable
         return $this->hasRole('Administrador');
     }
 
+    public function isDirPrograma(): bool
+    {
+        return $this->hasRole('DirectorPrograma');
+    }
+
     public function isDirector(): bool
     {
         return $this->hasRole('Director');
