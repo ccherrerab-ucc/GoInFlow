@@ -24,13 +24,26 @@ class ResultadoRepository implements ResultadoRepositoryInterface
             ->orderBy('id_resultado', 'desc');
 
         if ($user?->isDirector()) {
-            // Director ve resultados cuyas evidencias pertenecen a sus factores
             $query->whereHas(
                 'evidencias.aspecto.caracteristica.factor',
                 fn($q) => $q->where('responsable', $user->id)
             );
+        } elseif ($user?->isLiderCaracteristica()) {
+            // Líder ve resultados cuyas evidencias pertenecen a sus características
+            $query->whereHas(
+                'evidencias.aspecto.caracteristica',
+                fn($q) => $q->where('responsable', $user->id)
+            );
+        } elseif ($user?->isEnlace()) {
+            // Enlace ve resultados que creó o cuyas evidencias son de sus aspectos
+            $query->where(fn($q) => $q
+                ->where('created_by', $user->id)
+                ->orWhereHas(
+                    'evidencias.aspecto',
+                    fn($q2) => $q2->where('responsable', $user->id)
+                )
+            );
         }
-        // Admin, DirPrograma, Líder y Enlace ven todos
 
         return $query->get();
     }

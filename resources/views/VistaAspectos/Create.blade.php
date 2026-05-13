@@ -73,6 +73,23 @@
             @enderror
         </div>
 
+        {{-- Ruta carpeta --}}
+        <div class="mb-3">
+            <label class="gf-label" for="ruta_carpeta">Ruta de carpeta</label>
+            <input type="text"
+                   id="ruta_carpeta"
+                   name="ruta_carpeta"
+                   class="gf-input @error('ruta_carpeta') is-invalid @enderror"
+                   value="{{ old('ruta_carpeta') }}"
+                   placeholder="Ej. Factores/Factor 1/Característica 1/Aspecto 1">
+            <div style="font-size:11px;color:var(--gray-500);margin-top:4px;">
+                Subcarpeta dentro de la carpeta de la característica donde se cargan las evidencias.
+            </div>
+            @error('ruta_carpeta')
+                <div class="gf-field-error">{{ $message }}</div>
+            @enderror
+        </div>
+
         {{-- Fechas --}}
         <div class="row g-3 mb-3">
             <div class="col-md-6">

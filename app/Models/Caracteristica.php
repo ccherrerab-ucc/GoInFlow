@@ -14,6 +14,7 @@ class Caracteristica extends Model
     protected $fillable = [
         'name',
         'description',
+        'ruta_carpeta',
         'factor_id',
         'responsable',
         'fecha_inicio',

@@ -19,7 +19,7 @@ class ResultadoRequest extends FormRequest
             'fecha_inicio'        => ['required', 'date'],
             'fecha_fin'           => ['required', 'date', 'after_or_equal:fecha_inicio'],
             'status_id'           => ['required', 'exists:status_cna,id_status'],
-            'evidencias'          => ['nullable', 'array'],
+            'evidencias'          => ['required', 'array', 'min:1'],
             'evidencias.*'        => ['integer', 'exists:evidencias,id_evidencia'],
             'evidencias_enviadas' => ['nullable', 'string'],
         ];
@@ -35,6 +35,8 @@ class ResultadoRequest extends FormRequest
             'fecha_fin.after_or_equal' => 'La fecha de fin debe ser igual o posterior a la de inicio.',
             'status_id.required'       => 'El estado es obligatorio.',
             'status_id.exists'         => 'El estado seleccionado no es válido.',
+            'evidencias.required'      => 'Debes asociar al menos una evidencia al resultado.',
+            'evidencias.min'           => 'Debes asociar al menos una evidencia al resultado.',
             'evidencias.*.integer'     => 'Los IDs de evidencia deben ser números enteros.',
             'evidencias.*.exists'      => 'Una o más evidencias seleccionadas no existen.',
         ];

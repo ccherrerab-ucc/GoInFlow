@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Rol;
 use App\Models\User;
 use App\Models\Area;
 use App\Models\Departamento;
@@ -46,16 +47,18 @@ class RegisteredUserController extends Controller
             'second_last_name' => ['nullable', 'string', 'max:255'],
         ]);
 
+        $rolEnlace = Rol::where('name', 'Enlace')->value('id_rol');
+
         $user = User::create([
-            'name' => $request->name,
-            'first_surname' => $request->first_surname,
+            'name'             => $request->name,
+            'first_surname'    => $request->first_surname,
             'second_last_name' => $request->second_last_name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'id_area' => $request->id_area,
-            'id_departamento' => $request->id_departamento,
-            'id_status' => '1',
-            'id_rol' => '4',
+            'email'            => $request->email,
+            'password'         => Hash::make($request->password),
+            'id_area'          => $request->id_area,
+            'id_departamento'  => $request->id_departamento,
+            'id_status'        => 1,
+            'id_rol'           => $rolEnlace,
         ]);
 
         event(new Registered($user));

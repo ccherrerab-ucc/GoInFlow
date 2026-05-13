@@ -7,8 +7,10 @@ use App\Models\Aspecto;
 use App\Models\Evidencia;
 use App\Models\EstadoDocumento;
 use App\Models\StatusCna;
+use App\Models\User;
 use App\Services\EvidenciaService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 /**
@@ -39,7 +41,19 @@ class EvidenciaController extends Controller
     {
         $this->authorize('create', Evidencia::class);
 
-        $this->service->crear($request->validated());
+        $datos = $request->validated();
+
+        // Enlace solo puede cargar evidencias en aspectos que tiene a cargo
+        $raw  = Auth::user();
+        $user = $raw instanceof User ? $raw : null;
+        if ($user?->isEnlace()) {
+            $aspecto = Aspecto::findOrFail($datos['id_aspecto']);
+            if ($aspecto->responsable != $user->id) {
+                abort(403);
+            }
+        }
+
+        $this->service->crear($datos);
 
         return redirect()->route('evidencias.index')
             ->with('success', 'Evidencia creada exitosamente.');
@@ -70,18 +84,31 @@ class EvidenciaController extends Controller
 
     public function destroy(int $id): RedirectResponse
     {
+        $evidencia = $this->service->obtener($id);
+        $this->authorize('delete', $evidencia);
+
         $this->service->eliminar($id);
 
         return redirect()->route('evidencias.index')
-            ->with('success', 'Evidencia eliminada exitosamente.');
+            ->with('success', 'Evidencia suprimida exitosamente.');
     }
 
     /* ── Datos compartidos para create/edit ── */
     private function formData(): array
     {
+        $raw  = Auth::user();
+        $user = $raw instanceof User ? $raw : null;
+
+        $aspectosQuery = Aspecto::with('caracteristica')->orderBy('name');
+
+        // Enlace solo ve sus propios aspectos en el formulario de carga
+        if ($user?->isEnlace()) {
+            $aspectosQuery->where('responsable', $user->id);
+        }
+
         return [
             'statuses' => StatusCna::all(),
-            'aspectos' => Aspecto::with('caracteristica')->orderBy('name')->get(),
+            'aspectos' => $aspectosQuery->get(),
             'estados'  => EstadoDocumento::all(),
         ];
     }

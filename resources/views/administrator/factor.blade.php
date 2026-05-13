@@ -53,7 +53,7 @@
                             </a>
                             <form action="{{ route('factores.destroy', $factor->id_factor) }}"
                                   method="POST"
-                                  onsubmit="return confirm('¿Eliminar este factor?')">
+                                  onsubmit="return confirm('¿Suprimir este factor?')">
                                 @csrf @method('DELETE')
                                 <button type="submit"
                                         class="gf-btn gf-btn-danger"

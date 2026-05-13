@@ -49,6 +49,20 @@
                     </td>
                     <td>
                         <div class="d-flex gap-1">
+                            {{-- Ver descripción --}}
+                            @if($factor->description)
+                                <button type="button"
+                                        class="gf-btn gf-btn-outline"
+                                        style="height:30px;padding:0 10px;font-size:12px;"
+                                        title="Ver descripción"
+                                        data-bs-toggle="popover"
+                                        data-bs-trigger="hover focus"
+                                        data-bs-placement="left"
+                                        data-bs-content="{{ e($factor->description) }}">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            @endif
+
                             {{-- Editar — solo Admin --}}
                             @can('update', $factor)
                                 <a href="{{ route('factores.edit', $factor->id_factor) }}"
@@ -63,7 +77,7 @@
                             @can('delete', $factor)
                                 <form action="{{ route('factores.destroy', $factor->id_factor) }}"
                                       method="POST"
-                                      onsubmit="return confirm('¿Eliminar este factor?')">
+                                      onsubmit="return confirm('¿Suprimir este factor?')">
                                     @csrf @method('DELETE')
                                     <button type="submit"
                                             class="gf-btn gf-btn-danger"
@@ -93,3 +107,13 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('[data-bs-toggle="popover"]').forEach(function (el) {
+        new bootstrap.Popover(el, { sanitize: false });
+    });
+});
+</script>
+@endpush

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Repositories\Contracts\EvidenciaRepositoryInterface;
+use App\Services\Contracts\StatusResolverInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -14,7 +15,10 @@ use Illuminate\Support\Facades\Auth;
  */
 class EvidenciaService
 {
-    public function __construct(private readonly EvidenciaRepositoryInterface $repository) {}
+    public function __construct(
+        private readonly EvidenciaRepositoryInterface $repository,
+        private readonly StatusResolverInterface $statusResolver,
+    ) {}
     
     public function listar(): Collection
     {
@@ -41,8 +45,11 @@ class EvidenciaService
         return $this->repository->update($id, $datos);
     }
 
-    public function eliminar(int $id): bool
+    public function eliminar(int $id): void
     {
-        return $this->repository->delete($id);
+        $this->repository->update($id, [
+            'status_id'  => $this->statusResolver->suprimido(),
+            'updated_by' => Auth::id(),
+        ]);
     }
 }

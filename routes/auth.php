@@ -57,4 +57,7 @@ Route::middleware('auth')->group(function () {
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
+
+    // Redirect GET /logout to dashboard (prevents 405 when navigating directly)
+    Route::get('logout', fn() => redirect()->route('dashboard'));
 });

@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
-//use App\Repositories\FactorRepository;
-//use App\Repositories\Contracts\CnaRepositoryInterface;
+use App\Models\Rol;
+use App\Models\User;
 use App\Repositories\Contracts\FactorRepositoryInterface;
-
+use App\Services\Contracts\StatusResolverInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -18,7 +18,10 @@ use Illuminate\Support\Facades\Auth;
  */
 class FactorService
 {
-    public function __construct(private readonly FactorRepositoryInterface $repository) {}
+    public function __construct(
+        private readonly FactorRepositoryInterface $repository,
+        private readonly StatusResolverInterface $statusResolver,
+    ) {}
 
     public function listar(): Collection
     {
@@ -34,18 +37,40 @@ class FactorService
     {
         $datos['created_by'] = Auth::id();
         $datos['updated_by'] = Auth::id();
-        $datos['status_id']  = 1; // Activo al crear
-        return $this->repository->create($datos);
+        $datos['status_id']  = 1;
+        $factor = $this->repository->create($datos);
+        if (!empty($datos['responsable'])) {
+            $this->asignarRolDirector((int) $datos['responsable']);
+        }
+        return $factor;
     }
 
     public function actualizar(int $id, array $datos): Model
     {
         $datos['updated_by'] = Auth::id();
-        return $this->repository->update($id, $datos);
+        $factor = $this->repository->update($id, $datos);
+        if (!empty($datos['responsable'])) {
+            $this->asignarRolDirector((int) $datos['responsable']);
+        }
+        return $factor;
     }
 
-    public function eliminar(int $id): bool
+    private function asignarRolDirector(int $userId): void
     {
-        return $this->repository->delete($id);
+        $user = User::find($userId);
+        if (!$user || $user->isAdmin() || $user->isDirPrograma()) return;
+
+        $directorId = Rol::where('name', 'Director')->value('id_rol');
+        if ($directorId) {
+            $user->update(['id_rol' => $directorId]);
+        }
+    }
+
+    public function eliminar(int $id): void
+    {
+        $this->repository->update($id, [
+            'status_id'  => $this->statusResolver->suprimido(),
+            'updated_by' => Auth::id(),
+        ]);
     }
 }

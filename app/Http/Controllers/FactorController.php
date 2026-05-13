@@ -77,7 +77,7 @@ class FactorController extends Controller
         $this->service->eliminar($id);
 
         return redirect()->route('factores.index')
-            ->with('success', 'Factor eliminado exitosamente.');
+            ->with('success', 'Factor suprimido exitosamente.');
     }
 
     /* ── Datos compartidos para create/edit ── */

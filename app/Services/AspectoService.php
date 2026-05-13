@@ -3,13 +3,17 @@
 namespace App\Services;
 
 use App\Repositories\AspectoRepository;
+use App\Services\Contracts\StatusResolverInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
 class AspectoService
 {
-    public function __construct(private readonly AspectoRepository $repository) {}
+    public function __construct(
+        private readonly AspectoRepository $repository,
+        private readonly StatusResolverInterface $statusResolver,
+    ) {}
 
     public function listar(): Collection
     {
@@ -40,8 +44,11 @@ class AspectoService
         return $this->repository->update($id, $datos);
     }
 
-    public function eliminar(int $id): bool
+    public function eliminar(int $id): void
     {
-        return $this->repository->delete($id);
+        $this->repository->update($id, [
+            'status_id'  => $this->statusResolver->suprimido(),
+            'updated_by' => Auth::id(),
+        ]);
     }
 }

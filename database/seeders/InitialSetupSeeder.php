@@ -21,6 +21,25 @@ class InitialSetupSeeder extends Seeder
             'email'    => 'sistema@ucatolica.edu.co',
             'password' => Hash::make('SistemaPassword'),
         ]);
+        $directorPrograma = User::create([
+            'name'     => 'Sistema',
+            'first_surname' => 'DirectorPrograma',
+            'email'    => 'sistemadirectorprograma@ucatolica.edu.co',
+            'password' => Hash::make('SistemaPassword'),
+        ]);
+        $director = User::create([
+            'name'     => 'Sistema',
+            'first_surname' => 'Director',
+            'email'    => 'sistemadirector@ucatolica.edu.co',
+            'password' => Hash::make('SistemaPassword'),
+        ]);
+        $liderCaracteristica = User::create([
+            'name'     => 'Sistema',
+            'first_surname' => 'LiderCaracteristica',
+            'email'    => 'sistemalidercaracteristica@ucatolica.edu.co',
+            'password' => Hash::make('SistemaPassword'),
+        ]);
+
 
         // 2. STATUS
         $statuses = [
@@ -70,8 +89,9 @@ class InitialSetupSeeder extends Seeder
         // 4. ROLES
         $roles = [
             ['name' => 'Administrador'],
+            ['name' => 'DirectorPrograma'],
             ['name' => 'Director'],
-            ['name' => 'Lider Caracteristica'],
+            ['name' => 'LiderCaracteristica'],
             ['name' => 'Enlace'],
         ];
 
@@ -144,6 +164,21 @@ class InitialSetupSeeder extends Seeder
         $admin->update([
             'id_area'   => 1,
             'id_rol'    => 1,
+            'id_status' => 1,
+        ]);
+        $directorPrograma->update([
+            'id_area'   => 4,
+            'id_rol'    => 2,
+            'id_status' => 1,
+        ]);
+        $director->update([
+            'id_area'   => 4,
+            'id_rol'    => 3,
+            'id_status' => 1,
+        ]);
+        $liderCaracteristica->update([
+            'id_area'   => 4,
+            'id_rol'    => 4,
             'id_status' => 1,
         ]);
         // STATUS CNA — solo 3 valores según convención del proyecto

@@ -16,6 +16,7 @@ class CaracteristicaRequest extends FormRequest
         return [
             'name'              => ['required', 'string', 'max:255'],
             'description'       => ['nullable', 'string', 'max:500'],
+            'ruta_carpeta'      => ['nullable', 'string', 'max:500'],
             'factor_id'         => ['required', 'exists:factors,id_factor'],
             'responsable'       => ['nullable', 'exists:users,id'],
             'fecha_inicio'      => ['required', 'date'],

@@ -94,7 +94,7 @@
                             @can('delete', $r)
                                 <form action="{{ route('resultados.destroy', $r->id_resultado) }}"
                                       method="POST"
-                                      onsubmit="return confirm('¿Eliminar el resultado «{{ addslashes($r->name) }}»?')">
+                                      onsubmit="return confirm('¿Suprimir el resultado «{{ addslashes($r->name) }}»?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit"

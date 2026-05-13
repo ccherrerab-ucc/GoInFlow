@@ -51,7 +51,7 @@
                         </a>
                         <form action="{{ route('usuarios.destroy', $user->id) }}"
                             method="POST"
-                            onsubmit="return confirm('¿Eliminar este usuario?')">
+                            onsubmit="return confirm('¿Suprimir este usuario?')">
                             @csrf @method('DELETE') <!--Crear ruta eliminar pero realmente se va inactivar y no se podrá observar desde el sistema-->
                             <button type="submit"
                                 class="gf-btn gf-btn-danger"

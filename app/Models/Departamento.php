@@ -46,7 +46,7 @@ class Departamento extends Model
     }
 
     /*
-    PS C:\GoInFlow> php artisan tinker
+    PS C:\> php artisan tinker
     Psy Shell v0.12.21 (PHP 8.2.0 — cli) by Justin Hileman
     New PHP manual is available (latest: 3.0.5). Update with `doc --update-manual`
     > \App\Models\Departamento::with('area')->get()

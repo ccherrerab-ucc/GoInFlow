@@ -28,9 +28,9 @@ class FactorPolicy
         return false;
     }
 
-    public function create(User $user): bool  { return false; }
+    public function create(User $user): bool { return $user->isDirPrograma(); }
 
-    public function update(User $user, Factor $factor): bool { return false; }
+    public function update(User $user, Factor $factor): bool { return $user->isDirPrograma(); }
 
     public function delete(User $user, Factor $factor): bool { return false; }
 }

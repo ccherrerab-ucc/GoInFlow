@@ -46,11 +46,10 @@
         <tbody>
             @forelse($evidencias as $e)
             @php
-                $estadoEv      = $e->estado_actual ?? 1;
-                $claseEv       = $estadoClases[$estadoEv] ?? 'borrador';
-                $labelEv       = $estadoLabels[$estadoEv] ?? 'Borrador';
-                $iconoEv       = $estadoIconos[$estadoEv] ?? 'bi-file-earmark';
-                $esMiEvidencia = auth()->id() == $e->created_by;
+                $estadoEv = $e->estado_actual ?? 1;
+                $claseEv  = $estadoClases[$estadoEv] ?? 'borrador';
+                $labelEv  = $estadoLabels[$estadoEv] ?? 'Borrador';
+                $iconoEv  = $estadoIconos[$estadoEv] ?? 'bi-file-earmark';
             @endphp
                 <tr>
                     {{-- # --}}
@@ -105,8 +104,9 @@
                     <td style="white-space:nowrap;">
                         <div class="d-flex gap-1">
 
-                            {{-- Enviar a revisión (Borrador + creador) --}}
-                            @if($estadoEv == 1 && $esMiEvidencia)
+                            {{-- Enviar a revisión (Borrador + permiso iniciar) --}}
+                            @if($estadoEv == 1)
+                                @can('iniciar', $e)
                                 <form action="{{ route('flujo.iniciar', $e->id_evidencia) }}"
                                       method="POST"
                                       onsubmit="return confirm('¿Enviar esta evidencia al flujo de aprobación?')">
@@ -117,10 +117,12 @@
                                         <i class="bi bi-send"></i> Enviar
                                     </button>
                                 </form>
+                                @endcan
                             @endif
 
-                            {{-- Reenviar (Rechazado + creador) --}}
-                            @if($estadoEv == 4 && $esMiEvidencia)
+                            {{-- Reenviar (Rechazado + permiso iniciar) --}}
+                            @if($estadoEv == 4)
+                                @can('iniciar', $e)
                                 <form action="{{ route('flujo.reiniciar', $e->id_evidencia) }}"
                                       method="POST"
                                       onsubmit="return confirm('¿Volver a enviar esta evidencia al flujo de aprobación?')">
@@ -131,23 +133,26 @@
                                         <i class="bi bi-arrow-clockwise"></i> Reenviar
                                     </button>
                                 </form>
+                                @endcan
                             @endif
 
-                            {{-- Editar (Borrador o Rechazado + creador) --}}
-                            @if(in_array($estadoEv, [1, 4]) && $esMiEvidencia)
+                            {{-- Editar (Borrador o Rechazado + permiso update) --}}
+                            @if(in_array($estadoEv, [1, 4]))
+                                @can('update', $e)
                                 <a href="{{ route('evidencias.edit', $e->id_evidencia) }}"
                                    class="gf-btn gf-btn-outline"
                                    style="height:30px;padding:0 10px;font-size:12px;"
                                    title="Editar">
                                     <i class="bi bi-pencil"></i>
                                 </a>
+                                @endcan
                             @endif
 
                             {{-- Eliminar --}}
                             @can('delete', $e)
                                 <form action="{{ route('evidencias.destroy', $e->id_evidencia) }}"
                                       method="POST"
-                                      onsubmit="return confirm('¿Eliminar esta evidencia?')">
+                                      onsubmit="return confirm('¿Suprimir esta evidencia?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit"

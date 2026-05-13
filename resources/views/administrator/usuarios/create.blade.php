@@ -67,10 +67,11 @@
 
         <div class="col-md-6">
             <label class="gf-label">Área</label>
-            <select name="id_area" class="gf-select">
+            <select id="area-select" name="id_area" class="gf-select">
                 <option value="">— Seleccionar —</option>
                 @foreach($areas as $area)
-                    <option value="{{ $area->id_area }}">
+                    <option value="{{ $area->id_area }}"
+                        {{ old('id_area') == $area->id_area ? 'selected' : '' }}>
                         {{ $area->name }}
                     </option>
                 @endforeach
@@ -79,13 +80,8 @@
 
         <div class="col-md-6">
             <label class="gf-label">Departamento</label>
-            <select name="id_departamento" class="gf-select">
-                <option value="">— Seleccionar —</option>
-                @foreach($departamentos as $d)
-                    <option value="{{ $d->id_departamento }}">
-                        {{ $d->name }}
-                    </option>
-                @endforeach
+            <select id="departamento-select" name="id_departamento" class="gf-select">
+                <option value="">— Seleccionar área primero —</option>
             </select>
         </div>
 
@@ -130,3 +126,44 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const areaSelect        = document.getElementById('area-select');
+    const departamentoSelect = document.getElementById('departamento-select');
+    const selectedDep       = "{{ old('id_departamento', '') }}";
+
+    function loadDepartamentos(areaId, selectValue) {
+        if (!areaId) {
+            departamentoSelect.innerHTML = '<option value="">— Seleccionar área primero —</option>';
+            return;
+        }
+        departamentoSelect.innerHTML = '<option value="">Cargando...</option>';
+        fetch(`/departamentos/${areaId}`)
+            .then(r => r.json())
+            .then(data => {
+                departamentoSelect.innerHTML = '<option value="">— Seleccionar —</option>';
+                data.forEach(dep => {
+                    const opt = document.createElement('option');
+                    opt.value       = dep.id_departamento;
+                    opt.textContent = dep.name;
+                    if (dep.id_departamento == selectValue) opt.selected = true;
+                    departamentoSelect.appendChild(opt);
+                });
+            })
+            .catch(() => {
+                departamentoSelect.innerHTML = '<option value="">Error al cargar</option>';
+            });
+    }
+
+    areaSelect.addEventListener('change', function () {
+        loadDepartamentos(this.value, null);
+    });
+
+    if (areaSelect.value) {
+        loadDepartamentos(areaSelect.value, selectedDep);
+    }
+});
+</script>
+@endpush

@@ -17,7 +17,7 @@
     ];
 
     // ¿Es el usuario actual el responsable de esta característica?
-    $esResponsable = auth()->id() === (int) $caracteristica->responsable;
+    $esResponsable = auth()->id() == $caracteristica->responsable;
 
     // Recopilar todas las evidencias en una colección plana con referencia al aspecto
     $todasEvidencias = $caracteristica->aspectos->flatMap(function ($aspecto) {
@@ -138,12 +138,12 @@
         <div style="font-size:14px;font-weight:700;color:var(--primary);">
             <i class="bi bi-folder2-open me-2"></i>Evidencias de la característica
         </div>
-        @if($esResponsable)
+        @can('aprobar', new App\Models\Evidencia)
             <div style="font-size:12px;color:var(--gray-500);">
                 <i class="bi bi-info-circle me-1"></i>
                 Puedes aprobar o rechazar evidencias en estado "En revisión"
             </div>
-        @endif
+        @endcan
     </div>
 
     @if($todasEvidencias->isEmpty())
@@ -180,8 +180,8 @@
                 $ejecucionActiva = $ejecucion && is_null($ejecucion->finalizado_at);
                 $historialEv    = $ejecucion?->historial ?? collect();
 
-                // El responsable puede aprobar/rechazar si la evidencia está en revisión
-                $puedeAprobar = $esResponsable && $estado === 2 && $ejecucionActiva;
+                // Puede aprobar si el rol lo permite y la evidencia está en revisión activa
+                $puedeAprobar = $ejecucionActiva && $estado === 2 && Auth::user()->can('aprobar', $evidencia);
 
                 $tieneResultados = $evidencia->resultados->isNotEmpty();
                 $collapseId      = 'detalle-' . $evidencia->id_evidencia;
@@ -212,11 +212,13 @@
                     <span class="gf-status gf-status-{{ $claseEstado }}">
                         <i class="bi {{ $iconoEstado }} me-1"></i>{{ $labelEstado }}
                     </span>
-                    @if($estado === 2 && $esResponsable)
+                    @can('aprobar', $evidencia)
+                        @if($estado === 2)
                         <div style="font-size:10px;color:var(--primary);margin-top:3px;font-weight:600;">
                             <i class="bi bi-hand-index me-1"></i>Tu turno
                         </div>
-                    @endif
+                        @endif
+                    @endcan
                 </td>
 
                 {{-- Descripción --}}
@@ -295,8 +297,9 @@
                             </button>
                         @endif
 
-                        {{-- Creador: Reiniciar tras rechazo --}}
-                        @if($estado === 4 && auth()->id() === (int) $evidencia->created_by)
+                        {{-- Reiniciar tras rechazo --}}
+                        @if($estado === 4)
+                            @can('iniciar', $evidencia)
                             <form action="{{ route('flujo.reiniciar', $evidencia->id_evidencia) }}"
                                   method="POST"
                                   onsubmit="return confirm('¿Reiniciar el flujo? La evidencia volverá a revisión.')">
@@ -306,16 +309,19 @@
                                     <i class="bi bi-arrow-counterclockwise"></i> Reiniciar
                                 </button>
                             </form>
+                            @endcan
                         @endif
 
-                        {{-- Creador: Editar (Borrador o Rechazado) --}}
-                        @if(in_array($estado, [1, 4]) && auth()->id() === (int) $evidencia->created_by)
+                        {{-- Editar (Borrador o Rechazado) --}}
+                        @if(in_array($estado, [1, 4]))
+                            @can('update', $evidencia)
                             <a href="{{ route('evidencias.edit', $evidencia->id_evidencia) }}"
                                class="gf-btn gf-btn-outline"
                                style="height:30px;padding:0 10px;font-size:11px;"
                                title="Editar">
                                 <i class="bi bi-pencil"></i>
                             </a>
+                            @endcan
                         @endif
 
                     </div>

@@ -34,7 +34,9 @@ class ResultadoPolicy
 
     public function update(User $user, Resultado $resultado): bool
     {
-        return $user->isLiderCaracteristica() || $user->isEnlace();
+        if ($user->isLiderCaracteristica()) return true;
+        if ($user->isEnlace()) return $resultado->created_by == $user->id;
+        return false;
     }
 
     public function delete(User $user, Resultado $resultado): bool

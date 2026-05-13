@@ -82,7 +82,7 @@
                             @can('delete', $c)
                                 <form action="{{ route('caracteristicas.destroy', $c->id_caracteristica) }}"
                                       method="POST"
-                                      onsubmit="return confirm('¿Eliminar esta característica? Se eliminarán también sus aspectos asociados.')">
+                                      onsubmit="return confirm('¿Suprimir esta característica? Se suprimirán también sus aspectos asociados.')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit"

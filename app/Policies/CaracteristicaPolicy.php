@@ -44,6 +44,9 @@ class CaracteristicaPolicy
     public function update(User $user, Caracteristica $caracteristica): bool
     {
         if ($user->isDirPrograma()) return true;
+        if ($user->isDirector()) {
+            return $caracteristica->factor?->responsable == $user->id;
+        }
         if ($user->isLiderCaracteristica()) {
             return $caracteristica->responsable == $user->id;
         }

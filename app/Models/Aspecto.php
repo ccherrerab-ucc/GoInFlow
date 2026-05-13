@@ -15,6 +15,7 @@ class Aspecto extends Model
     protected $fillable = [
         'name',
         'description',
+        'ruta_carpeta',
         'caracteristica_id',
         'responsable',
         'fecha_inicio',

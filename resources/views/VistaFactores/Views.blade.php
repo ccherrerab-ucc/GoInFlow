@@ -61,7 +61,7 @@
                             </a>
                             <form action="{{ route('caracteristicas.destroy', $c->id_caracteristica) }}"
                                   method="POST"
-                                  onsubmit="return confirm('¿Eliminar esta característica?')">
+                                  onsubmit="return confirm('¿Suprimir esta característica?')">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="gf-btn gf-btn-danger"
                                         style="height:30px;padding:0 10px;font-size:12px;">

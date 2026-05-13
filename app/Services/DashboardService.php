@@ -19,7 +19,7 @@ class DashboardService
      */
     public function getMetrics(User $user): array
     {
-        $isGlobal = $user->isAdmin() || $user->isDirector();
+        $isGlobal = $user->isAdmin() || $user->isDirPrograma() || $user->isDirector();
         $aspIds   = $this->resolveAspIds($user);
         $carIds   = $this->resolveCarIds($user, $aspIds);
 
@@ -54,7 +54,7 @@ class DashboardService
 
     private function resolveScope(User $user): string
     {
-        if ($user->isAdmin() || $user->isDirector()) return 'global';
+        if ($user->isAdmin() || $user->isDirPrograma() || $user->isDirector()) return 'global';
         if ($user->isLiderCaracteristica())           return 'lider';
         return 'enlace';
     }
@@ -65,7 +65,7 @@ class DashboardService
      */
     private function resolveAspIds(User $user): ?array
     {
-        if ($user->isAdmin() || $user->isDirector()) {
+        if ($user->isAdmin() || $user->isDirPrograma() || $user->isDirector()) {
             return null;
         }
         if ($user->isLiderCaracteristica()) {
@@ -78,7 +78,7 @@ class DashboardService
 
     private function resolveCarIds(User $user, ?array $aspIds): ?array
     {
-        if ($user->isAdmin() || $user->isDirector()) {
+        if ($user->isAdmin() || $user->isDirPrograma() || $user->isDirector()) {
             return null;
         }
         if ($user->isLiderCaracteristica()) {

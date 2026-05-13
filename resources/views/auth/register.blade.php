@@ -79,13 +79,17 @@
 
                 <!-- Botón Register -->
                 <div class="d-flex justify-content-between align-items-center mt-4">
-                    <a class="text-decoration-underline text-secondary" href="{{ route('login') }}">
-                        {{ __('Already registered?') }}
+                    <a class="text-decoration-underline text-secondary" style="font-size:13px;"
+                       href="{{ route('login') }}">
+                        ¿Ya está registrado?
                     </a>
 
-                    <x-primary-button class="btn btn-goinflow ms-2">
-                        {{ __('Register') }}
-                    </x-primary-button>
+                    <button type="submit"
+                            style="height:38px;padding:0 20px;background:#0C447C;color:#fff;
+                                   border:none;border-radius:8px;font-size:13px;font-weight:500;
+                                   cursor:pointer;white-space:nowrap;">
+                        Registrarse
+                    </button>
                 </div>
             </form>
         </div>

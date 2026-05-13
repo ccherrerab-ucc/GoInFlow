@@ -40,6 +40,6 @@ class StatusResolver implements StatusResolverInterface
 
     public function suprimido(): int
     {
-        return $this->resolverPorNombre('Suprimido');
+        return $this->resolverPorNombre('Suprimido'); 
     }
 }

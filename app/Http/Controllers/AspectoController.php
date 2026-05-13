@@ -71,7 +71,7 @@ class AspectoController extends Controller
         $this->service->eliminar($id);
 
         return redirect()->route('aspectos.index')
-            ->with('success', 'Aspecto eliminado exitosamente.');
+            ->with('success', 'Aspecto suprimido exitosamente.');
     }
 
     private function formData(): array

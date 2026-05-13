@@ -13,9 +13,7 @@ use App\Http\Controllers\FlujoEjecucionController;
 use App\Http\Controllers\UsuarioController;
 use Illuminate\Support\Facades\Route;
 
-/*Route::get('/', function () {
-    return view('welcome');
-});*/
+Route::get('/', [DashboardController::class, 'index'])->middleware('auth')->name('home');
 
 Route::get('/dashboards', function () {
     return view('dashboard');

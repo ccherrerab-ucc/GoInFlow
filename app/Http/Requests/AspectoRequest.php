@@ -16,6 +16,7 @@ class AspectoRequest extends FormRequest
         return [
             'name'               => ['required', 'string', 'max:255'],
             'description'        => ['nullable', 'string', 'max:500'],
+            'ruta_carpeta'       => ['nullable', 'string', 'max:500'],
             'caracteristica_id'  => ['required', 'exists:caracteristicas,id_caracteristica'],
             'responsable'        => ['nullable', 'exists:users,id'],
             'fecha_inicio'       => ['required', 'date'],

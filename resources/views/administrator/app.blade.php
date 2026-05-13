@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>GoInFlow — @yield('title', 'Dashboard')</title>
+    <title>Evidentia — @yield('title', 'Dashboard')</title>
 
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -16,7 +16,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
     <style>
-        /* ─── Variables institucionales GoInFlow ─── */
+        /* ─── Variables institucionales Evidentia ─── */
         :root {
             --primary: #0C447C;
             --primary-dark: #042C53;
@@ -769,7 +769,7 @@
                     <i class="bi bi-folder2-open"></i>
                 </div>
                 <div>
-                    <div class="gf-brand-name">GoInFlow</div>
+                    <div class="gf-brand-name">Evidentia</div>
                     <div class="gf-brand-sub">UCatólica · Factor 5</div>
                 </div>
             </a>
@@ -858,20 +858,26 @@
                 <div class="gf-nav-section-title">Acreditación CNA</div>
             </div>
 
+            @can('viewAny', App\Models\Factor::class)
             <a class="gf-nav-item level-1 {{ request()->routeIs('factores*') ? 'active' : '' }}"
                 href="{{ route('factores.index') }}">
                 <i class="bi bi-bookmark-star"></i> Factor
             </a>
+            @endcan
 
+            @can('viewAny', App\Models\Caracteristica::class)
             <a class="gf-nav-item level-2 {{ request()->routeIs('caracteristicas*') ? 'active' : '' }}"
                 href="{{ route('caracteristicas.index') }}">
                 <i class="bi bi-diagram-3"></i> Características
             </a>
+            @endcan
 
+            @can('viewAny', App\Models\Aspecto::class)
             <a class="gf-nav-item level-3 {{ request()->routeIs('aspectos*') ? 'active' : '' }}"
                 href="{{ route('aspectos.index') }}">
                 <i class="bi bi-list-check"></i> Aspectos por evaluar
             </a>
+            @endcan
 
             {{-- GESTIÓN DOCUMENTAL --}}
             <hr class="gf-nav-divider">
@@ -1008,6 +1014,57 @@
     </script>
 
     @stack('scripts')
+
+    {{-- ═══ MODAL: ACCESO DENEGADO ═══ --}}
+    @if(session('forbidden'))
+    <div class="modal fade" id="modalForbidden" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width:420px;">
+            <div class="modal-content" style="border-radius:14px;border:none;
+                         box-shadow:0 8px 32px rgba(12,68,124,0.18);overflow:hidden;">
+
+                {{-- Header --}}
+                <div style="background:var(--danger-bg);border-bottom:1px solid var(--danger-border);
+                             padding:20px 24px 16px;display:flex;align-items:center;gap:12px;">
+                    <div style="width:40px;height:40px;border-radius:50%;background:var(--danger-border);
+                                display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="bi bi-shield-x" style="font-size:20px;color:var(--danger-text);"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:15px;font-weight:700;color:var(--danger-text);">
+                            Acceso denegado
+                        </div>
+                        <div style="font-size:12px;color:var(--danger-text);opacity:.8;">
+                            Sin permiso para esta acción
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Body --}}
+                <div style="padding:20px 24px;">
+                    <p style="font-size:13px;color:var(--gray-600);margin:0;line-height:1.6;">
+                        {{ session('forbidden') }}
+                    </p>
+                </div>
+
+                {{-- Footer --}}
+                <div style="padding:0 24px 20px;display:flex;justify-content:flex-end;">
+                    <button type="button"
+                            class="gf-btn gf-btn-outline"
+                            style="height:36px;"
+                            data-bs-dismiss="modal">
+                        Entendido
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            new bootstrap.Modal(document.getElementById('modalForbidden')).show();
+        });
+    </script>
+    @endif
 </body>
 
 </html>
